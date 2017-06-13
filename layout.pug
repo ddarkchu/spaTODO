@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    script(src="https://www.gstatic.com/firebasejs/4.1.1/firebase.js" )
+    script.
+      var config = {
+        apiKey: "AIzaSyBxy23E579b2PC48SQZpMbJtBsK9gsUPbs",
+        authDomain: "todo-47c04.firebaseapp.com",
+        databaseURL: "https://todo-47c04.firebaseio.com",
+        projectId: "todo-47c04",
+        storageBucket: "todo-47c04.appspot.com",
+        messagingSenderId: "112475226816"
+      };
+      firebase.initializeApp(config);
+
+    title= title
+    link(rel='stylesheet', href='./main.css')
+  body(class="hide")
+    block content
