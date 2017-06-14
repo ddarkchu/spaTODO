@@ -1,7 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const extractCSS = new ExtractTextPlugin('[name].bundle.css')
+const webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 function pugPage(name) {
   return new HtmlWebpackPlugin({
@@ -28,7 +27,8 @@ module.exports = {
   },
   output: {
     path: PATHS.output,
-    filename: 'js/[name].js'
+    filename: 'js/[name].js',
+    // publicPath: "/assets/",
   },
   module: {
     rules: [{
@@ -46,15 +46,48 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: extractCSS.extract(['css-loader', 'sass-loader'])
+        // use: ExtractTextPlugin.extract({
+        //   fallback: "style-loader",
+        //   use: {
+        //     loader: "css-loader",
+        //     options: {
+        //       sourceMap: true,
+        //       minimize:true
+        //     }
+        //   },
+        //   publicPath: "../"
+        // })
+        // use: [
+        //   {
+        //     loader: "style-loader/useable",
+        //     insertInto:"head"
+        //   },
+        // ]
+        use: [{
+            loader: "style-loader/url"
+          },
+          {
+            loader: "file-loader"
+          }
+        ]
+        // { loader: "css-loader" },
+      },
+      {
+        test: /\.jpg$/,
+        loader: "file-loader"
       }
     ]
   },
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: true
-    }),
-    // extractCSS,
+    // new ExtractTextPlugin({
+    //   filename: '[name].css'
+    // }),
+
+    // new webpack.optimize.UglifyJsPlugin({
+    //   compress: false
+    // }),
+    // new ExtractTextPlugin("dist/stylesheets/bundle/[name].css"),
+
     pugPage('index')
   ]
 }

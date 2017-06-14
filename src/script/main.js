@@ -1,3 +1,6 @@
+import style from "../style/style.css"
+// style.use();
+console.log(style);
 function hide(el) {
   if (el) {
     el.classList.add('hide')
@@ -62,7 +65,7 @@ function validCheck(query) {
   let result = false;
   let list = _qs(query);
   for (let item of list) {
-    for (temp of item.querySelectorAll('[valid]')) {
+    for (let temp of item.querySelectorAll('[valid]')) {
       var reg = new RegExp(temp.getAttribute('valid'));
       if (temp.value.match(reg) == null) {
         temp.classList.add("valid_fail");
@@ -155,5 +158,5 @@ _q('#signin_layout ._signin').onclick = (e) => {
 
 _q('#signin_layout ._signup').onclick = (e) => {
   e.preventDefault();
-	changeViewDisplay('#signup_layout');
+  changeViewDisplay('#signup_layout');
 }
