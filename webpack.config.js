@@ -28,7 +28,6 @@ module.exports = {
   output: {
     path: PATHS.output,
     filename: 'js/[name].js',
-    // publicPath: "/assets/",
   },
   module: {
     rules: [{
@@ -46,48 +45,20 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        // use: ExtractTextPlugin.extract({
-        //   fallback: "style-loader",
-        //   use: {
-        //     loader: "css-loader",
-        //     options: {
-        //       sourceMap: true,
-        //       minimize:true
-        //     }
-        //   },
-        //   publicPath: "../"
-        // })
-        // use: [
-        //   {
-        //     loader: "style-loader/useable",
-        //     insertInto:"head"
-        //   },
-        // ]
         use: [{
-            loader: "style-loader/url"
+            loader: "style-loader/useable",
           },
           {
-            loader: "file-loader"
+            loader: "css-loader",
+            options: {
+              minimize: true
+            }
           }
         ]
-        // { loader: "css-loader" },
-      },
-      {
-        test: /\.jpg$/,
-        loader: "file-loader"
       }
     ]
   },
   plugins: [
-    // new ExtractTextPlugin({
-    //   filename: '[name].css'
-    // }),
-
-    // new webpack.optimize.UglifyJsPlugin({
-    //   compress: false
-    // }),
-    // new ExtractTextPlugin("dist/stylesheets/bundle/[name].css"),
-
     pugPage('index')
   ]
 }

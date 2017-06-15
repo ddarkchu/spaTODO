@@ -1,6 +1,6 @@
-import style from "../style/style.css"
-// style.use();
-console.log(style);
+var style = require("../style/style.css")
+style.use();
+
 function hide(el) {
   if (el) {
     el.classList.add('hide')

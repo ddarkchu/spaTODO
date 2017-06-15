@@ -1,17 +1,6 @@
 doctype html
 html
   head
-    //- link(rel="stylesheet" type="text/css" href="${require('../style/main.css')})
-    //- /*style.*/
-    //-   /*#{require('../style/main.css')}*/
-    //- link(rel="stylesheet" href=require("../style/main.css"))
-    //- link(href=require("../style/style.css"))
-    //- each css in htmlWebpackPlugin.files.css
-      
-      //- link(href=css, rel='preload', as='style', onload=`this.rel='stylesheet'`)
-      //- noscript
-        //- link(href=css, rel='stylesheet')
-    link(rel="stylesheet" href="./main.css")
     script(src="https://www.gstatic.com/firebasejs/4.1.1/firebase.js" )
     script.
       var config = {
@@ -25,7 +14,5 @@ html
       firebase.initializeApp(config);
 
     title= title
-
-
   body(class="hide")
     block content
