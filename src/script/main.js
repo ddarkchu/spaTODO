@@ -88,7 +88,7 @@ firebase.auth().onAuthStateChanged(function(user) {
       cell.removeChild(cell.firstChild);
     }
     console.log("login");
-    let table = firebase.database().ref('/');
+    let table = firebase.database().ref('/board');
     let div = _q('#main_layout .data');
     table.on('child_added', function(data) {
       console.log("dataAdd")
@@ -119,7 +119,7 @@ _q('#main_layout ._input_btn').onclick = (e) => {
   if (text.trim() != "") {
     var database = firebase.database();
     if (database) {
-      database.ref("/").push(text).then((e) => {
+      database.ref("/board").push(text).then((e) => {
         el_text.value = "";
         console.log("success", e)
       }).catch((e) => {
