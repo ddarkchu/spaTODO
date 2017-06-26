@@ -2,36 +2,53 @@ body {
   margin: 0px;
 }
 
+html {
+  height: 100%;
+}
+
 .hide {
   display: none !important;
 }
 
-div.small {
-  position: relative;
-  width: 100%;
-  height: 450px;
-  margin-bottom: 10px;
-  display: inline-block;
-}
-
-div.ab_button {
-  position: absolute;
-}
-
-iframe {
-  width: 100%;
+.left {
   height: inherit;
+  background-color: red;
+  width: 300px;
 }
 
-div.full {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  background: white;
+.right {
+  height: inherit;
+  background-color: green;
+  width: calc(100% - 300px);
+}
+
+.main {
   width: 100%;
   height: 100%;
+  float: left;
+  position: relative;
 }
 
-iframe {
-  border-width: 0px;
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+ul.menu {
+  list-style-type: none;
+  padding:0;
+  /*text-overflow: ellipsis; */
+  width:100%;
+}
+ul.menu li{
+  width:100%;
+}
+ul.menu a{
+  width:inherit;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: inline-block;
 }

@@ -1,32 +1,6 @@
 var style = require("../style/style.css")
 style.use();
-
-function hide(el) {
-  if (el) {
-    el.classList.add('hide')
-  }
-}
-
-function show(el) {
-  if (el) {
-    el.classList.remove('hide')
-  }
-}
-var _q = (string) => {
-  return document.querySelector(string);
-}
-var _qs = (string) => {
-  return document.querySelectorAll(string);
-}
-// login("portars@naver.com","test123");
-
-function changeViewDisplay(selector) {
-  for (var i of _qs(".js_layout")) {
-    hide(i);
-  }
-  show(_q(selector));
-  show(document.body);
-}
+var cm = require("./common.js")
 
 function signIn(id, password) {
   if (!firebase.auth().currentUser) {
@@ -61,35 +35,18 @@ function signOut() {
   }
 }
 
-function validCheck(query) {
-  let result = false;
-  let list = _qs(query);
-  for (let item of list) {
-    for (let temp of item.querySelectorAll('[valid]')) {
-      var reg = new RegExp(temp.getAttribute('valid'));
-      if (temp.value.match(reg) == null) {
-        temp.classList.add("valid_fail");
-        if (!result) result = true;
-      } else {
-        temp.classList.remove("valid_fail");
-      }
-    }
-  }
-  return result;
-}
-
 
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
 
 
-    let cell = _q('.data');
+    let cell = cm._q('.data');
     while (cell.hasChildNodes()) {
       cell.removeChild(cell.firstChild);
     }
     console.log("login");
-    let table = firebase.database().ref('/board');
-    let div = _q('#main_layout .data');
+    let table = firebase.database().ref('/menu');
+    let div = cm._q('#main_layout .data');
     table.on('child_added', function(data) {
       console.log("dataAdd")
       let temp = document.createElement('div');
@@ -103,23 +60,23 @@ firebase.auth().onAuthStateChanged(function(user) {
       temp.innerHTML = data.val();
     });
     table.on('child_removed', function(data) {
-      _q('.' + data.key).remove();
+      cm._q('.' + data.key).remove();
     });
-    changeViewDisplay('#main_layout');
+    cm.changeViewDisplay('#main_layout');
   } else {
-    changeViewDisplay('#signin_layout');
+    cm.changeViewDisplay('#signin_layout');
     console.log("need login");
   }
 });
 
 
-_q('#main_layout ._input_btn').onclick = (e) => {
-  let el_text = _q('#main_layout ._input');
-  let text = _q('#main_layout ._input').value;
+cm._q('#main_layout ._input_btn').onclick = (e) => {
+  let el_text = cm._q('#main_layout ._input');
+  let text = cm._q('#main_layout ._input').value;
   if (text.trim() != "") {
     var database = firebase.database();
     if (database) {
-      database.ref("/board").push(text).then((e) => {
+      database.ref("/menu").push(text).then((e) => {
         el_text.value = "";
         console.log("success", e)
       }).catch((e) => {
@@ -129,34 +86,34 @@ _q('#main_layout ._input_btn').onclick = (e) => {
   }
 }
 
-_q('#sign_out ._signout').onclick = (e) => {
+cm._q('#sign_out ._signout').onclick = (e) => {
   e.preventDefault();
   signOut();
 }
 
-_q('#signup_layout ._signup').onclick = (e) => {
+cm._q('#signup_layout ._signup').onclick = (e) => {
   e.preventDefault();
-  validCheck('#signup_layout');
-  let els = _qs('#signup_layout .valid_fail');
+  cm.validCheck('#signup_layout');
+  let els = cm._qs('#signup_layout .valid_fail');
   if (els.length == 0) {
-    let id = _q('#signup_layout ._user_id').value;
-    let pw = _q('#signup_layout ._user_password').value;
+    let id = cm._q('#signup_layout ._user_id').value;
+    let pw = cm._q('#signup_layout ._user_password').value;
     signUp(id, pw);
   }
 }
 
-_q('#signin_layout ._signin').onclick = (e) => {
+cm._q('#signin_layout ._signin').onclick = (e) => {
   e.preventDefault();
-  validCheck('#signin_layout');
-  let els = _qs('#signin_layout .valid_fail');
+  cm.validCheck('#signin_layout');
+  let els = cm._qs('#signin_layout .valid_fail');
   if (els.length == 0) {
-    let id = _q('#signin_layout ._user_id').value;
-    let pw = _q('#signin_layout ._user_password').value;
+    let id = cm._q('#signin_layout ._user_id').value;
+    let pw = cm._q('#signin_layout ._user_password').value;
     signIn(id, pw);
   }
 }
 
-_q('#signin_layout ._signup').onclick = (e) => {
+cm._q('#signin_layout ._signup').onclick = (e) => {
   e.preventDefault();
   changeViewDisplay('#signup_layout');
 }

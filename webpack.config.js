@@ -23,7 +23,7 @@ module.exports = {
   devtool: 'sourcemaps',
   entry: {
     main: PATHS.entries + 'main.js',
-    // about: PATHS.entries + 'about.js'
+    blog: PATHS.entries + 'blog.js'
   },
   output: {
     path: PATHS.output,
@@ -59,6 +59,7 @@ module.exports = {
     ]
   },
   plugins: [
-    pugPage('index')
+    pugPage('index'),
+    pugPage('blog')
   ]
 }
