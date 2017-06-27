@@ -1,16 +1,45 @@
-var style = require("../style/style.css")
+var style = require("../style/style.css");
 style.use();
-var cm = require("./common.js")
-cm.show(cm._q("body"))
-
-function loadMenu(){
+var cm = require("./common.js");
+var loadMenu = new Promise(function loadMenu(resolve, reject) {
   var menu = firebase.database().ref("/menu");
-  menu.orderByKey().onece().then((data)=>{
-    
+  menu.orderByKey().once('value').then((datas) => {
+    try {
+      var ul = document.querySelector('ul.menu');
+      var data = datas.val();
+      for (var key in data) {
+        var label = document.createElement("label");
+        var text = document.createTextNode(data[key]);
+        label.appendChild(text);
+        var a = document.createElement("a");
+        a.appendChild(label);
+        a.setAttribute("href", "#menu=" + key);
+        a.setAttribute("title", data[key]);
+        var li = document.createElement("li");
+        li.appendChild(a);
+        ul.appendChild(li);
+      }
+      resolve();
+    } catch (err) {
+      console.error(err);
+      reject(err);
+    }
   });
+})
+loadMenu.then(function() {
+  cm.show(cm._q("body"));
+});
+// menu 메뉴 id
+// postId 게시글 아이디
 
+var postData = {
+  title:"",
+  createDate:0,
+  data:"",
+  menu:""
 }
 
+// loadMenu();
 //
 // function pagiNation() {
 //   var endAt;

@@ -12,13 +12,13 @@ html {
 
 .left {
   height: inherit;
-  background-color: red;
+  /*background-color: red;*/
   width: 300px;
 }
 
 .right {
   height: inherit;
-  background-color: green;
+  /*background-color: green;*/
   width: calc(100% - 300px);
 }
 
@@ -42,6 +42,7 @@ ul.menu {
   padding:0;
   /*text-overflow: ellipsis; */
   width:100%;
+  text-align: center;
 }
 ul.menu li{
   width:100%;
