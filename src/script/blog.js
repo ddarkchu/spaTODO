@@ -1,8 +1,9 @@
 var style = require("../style/style.css");
 style.use();
 var cm = require("./common.js");
+var database = firebase.database();
 var loadMenu = new Promise(function loadMenu(resolve, reject) {
-  var menu = firebase.database().ref("/menu");
+  var menu = database.ref("/menu/data");
   menu.orderByKey().once('value').then((datas) => {
     try {
       var ul = document.querySelector('ul.menu');
@@ -15,6 +16,11 @@ var loadMenu = new Promise(function loadMenu(resolve, reject) {
         a.appendChild(label);
         a.setAttribute("href", "#menu=" + key);
         a.setAttribute("title", data[key]);
+        a.onclick = ((key) => {
+          return () => {
+            console.log(key)
+          };
+        })(key);
         var li = document.createElement("li");
         li.appendChild(a);
         ul.appendChild(li);
@@ -25,48 +31,91 @@ var loadMenu = new Promise(function loadMenu(resolve, reject) {
       reject(err);
     }
   });
-})
+});
 loadMenu.then(function() {
   cm.show(cm._q("body"));
 });
 // menu 메뉴 id
 // postId 게시글 아이디
 
-var postData = {
-  title:"",
-  createDate:0,
-  data:"",
-  menu:""
+function postData() {
+  return {
+    title: "",
+    createDate: 0,
+    data: ""
+  }
 }
 
-// loadMenu();
-//
-// function pagiNation() {
-//   var endAt;
-//   return (size, page, callback) => {
-//     if (page != 1) {
-//
-//     }
-//     firebase.database().ref("/menu").orderByKey().endAt('-KnIvHSvAt_QYoWBLtxx').limitToLast(2).once("value").then((s) => {
-//       console.log(s.val())
-//     })
-//   };
-// }
-//
-//
-// var menuCount = firebase.database().ref('menuCount');
-// menuCount.transaction(function(menuCount) {
-//   if (!menuCount) {
-//     menuCount = 0;
-//   }
-//   return menuCount + 1;
-// }, function(error, committed, snapshot) {
-//   if (error) {
-//     console.log('Transaction failed abnormally!', error);
-//   } else if (!committed) {
-//     console.log('We aborted the transaction (because ada already exists).');
-//   } else {
-//     console.log('User ada added!');
-//   }
-//   console.log("Ada's data: ", snapshot.val());
-// });
+function hashToValue() {
+  let data = {};
+  for (let item of location.hash.replace("#", "").split("&")) {
+    let keyValue = item.split('=');
+    data[keyValue[0]] = keyValue[1];
+  }
+  return data;
+}
+// saveData("-KnDOM9a_QVwAZXjj2SV", "test", "<head></head>")
+
+function saveData(menu, title, data) {
+  let saveData = new postData();
+  saveData.title = title;
+  saveData.data = data;
+  saveData.createDate = (new Date()).getTime();
+
+  database.ref("/board/" + menu + "/boardTime").transaction(function(boardTime) {
+
+    if (!boardTime || boardTime < saveData.createDate) {
+      boardTime = saveData.createDate;
+    }
+    return boardTime;
+  }, function(error, committed, snapshot) {
+    if (error) {
+      console.log('Transaction failed abnormally!', error);
+    } else if (!committed) {
+      console.log('We aborted the transaction (because ada already exists).');
+    } else {
+      if (snapshot.val() == saveData.createDate) {
+        database.ref("/board/" + menu + "/boardCount").transaction(function(boardCount) {
+          if (!boardCount) {
+            boardCount = 0;
+          }
+          return boardCount + 1;
+        }, function(error, committed, snapshot) {
+          if (error) {
+            console.log('Transaction failed abnormally!', error);
+          } else if (!committed) {
+            console.log('We aborted the transaction (because ada already exists).');
+          } else {
+            database.ref("/board/" + menu + "/data").push(saveData);
+          }
+        });
+      } else {
+
+      }
+    }
+  });
+
+}
+// saveMenu("test")
+function saveMenu(menu) {
+  let menuCount = database.ref("/menu/menuCount");
+  return menuCount.transaction(function(menuCount) {
+    if (!menuCount) {
+      menuCount = 0;
+    }
+    return menuCount + 1;
+  }, function(error, committed, snapshot) {
+    if (error) {
+      console.log('Transaction failed abnormally!', error);
+    } else if (!committed) {
+      console.log('We aborted the transaction (because ada already exists).');
+    } else {
+      database.ref("/menu/data").push(menu);
+    }
+  });
+}
+
+
+document.body.onhashchange = () => {
+  console.log("fdsa")
+}

@@ -53,3 +53,6 @@ ul.menu a{
   overflow: hidden;
   display: inline-block;
 }
+ul.menu a:hover{
+  background-color: gray;
+}

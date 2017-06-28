@@ -5,7 +5,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 function pugPage(name) {
   return new HtmlWebpackPlugin({
     filename: name + '.html',
-    template: __dirname + '/src/pug/' + name + '.pug',
+    template: PATHS.pug + name + '.pug',
     inject: false
   })
 }
