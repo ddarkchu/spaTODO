@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -196,12 +196,12 @@ module.exports = {
 
 var refs = 0;
 var dispose;
-var content = __webpack_require__(4);
+var content = __webpack_require__(2);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) exports.locals = content.locals;
 exports.use = exports.ref = function() {
 	if(!(refs++)) {
-		dispose = __webpack_require__(6)(content, {});
+		dispose = __webpack_require__(4)(content, {});
 	}
 	return exports;
 };
@@ -231,146 +231,21 @@ if(false) {
 }
 
 /***/ }),
-/* 2 */,
-/* 3 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-var style = __webpack_require__(1);
-style.use();
-var cm = __webpack_require__(0);
-
-function signIn(id, password) {
-  if (!firebase.auth().currentUser) {
-    firebase.auth().signInWithEmailAndPassword(id, password).catch(function (error) {
-      console.log(error);
-      alert(error);
-    });
-  } else {
-    console.log("already login");
-  }
-}
-
-function signUp(id, password) {
-  if (!firebase.auth().currentUser) {
-    firebase.auth().createUserWithEmailAndPassword(id, password).catch(function (error) {
-      console.log(error);
-      alert(error);
-    });
-  } else {
-    console.log("already login");
-  }
-}
-
-function signOut() {
-  if (firebase.auth().currentUser) {
-    firebase.auth().signOut().catch(function (error) {
-      alert(error);
-      console.log(error);
-    });
-  } else {
-    console.log("already SignOut");
-  }
-}
-
-firebase.auth().onAuthStateChanged(function (user) {
-  if (user) {
-
-    var cell = cm._q('.data');
-    while (cell.hasChildNodes()) {
-      cell.removeChild(cell.firstChild);
-    }
-    console.log("login");
-    var table = firebase.database().ref('/menu');
-    var div = cm._q('#main_layout .data');
-    table.on('child_added', function (data) {
-      console.log("dataAdd");
-      var temp = document.createElement('div');
-      temp.classList.add(data.key);
-      temp.innerHTML = data.val();
-      div.append(temp);
-    });
-    table.on('child_changed', function (data) {
-      console.log(data.key);
-      var temp = div.querySelector('.' + data.key);
-      temp.innerHTML = data.val();
-    });
-    table.on('child_removed', function (data) {
-      cm._q('.' + data.key).remove();
-    });
-    cm.changeViewDisplay('#main_layout');
-  } else {
-    cm.changeViewDisplay('#signin_layout');
-    console.log("need login");
-  }
-});
-
-cm._q('#main_layout ._input_btn').onclick = function (e) {
-  var el_text = cm._q('#main_layout ._input');
-  var text = cm._q('#main_layout ._input').value;
-  if (text.trim() != "") {
-    var database = firebase.database();
-    if (database) {
-      database.ref("/menu").push(text).then(function (e) {
-        el_text.value = "";
-        console.log("success", e);
-      }).catch(function (e) {
-        console.log("error", e);
-      });
-    }
-  }
-};
-
-cm._q('#sign_out ._signout').onclick = function (e) {
-  e.preventDefault();
-  signOut();
-};
-
-cm._q('#signup_layout ._signup').onclick = function (e) {
-  e.preventDefault();
-  cm.validCheck('#signup_layout');
-  var els = cm._qs('#signup_layout .valid_fail');
-  if (els.length == 0) {
-    var id = cm._q('#signup_layout ._user_id').value;
-    var pw = cm._q('#signup_layout ._user_password').value;
-    signUp(id, pw);
-  }
-};
-
-cm._q('#signin_layout ._signin').onclick = function (e) {
-  e.preventDefault();
-  cm.validCheck('#signin_layout');
-  var els = cm._qs('#signin_layout .valid_fail');
-  if (els.length == 0) {
-    var id = cm._q('#signin_layout ._user_id').value;
-    var pw = cm._q('#signin_layout ._user_password').value;
-    signIn(id, pw);
-  }
-};
-
-cm._q('#signin_layout ._signup').onclick = function (e) {
-  e.preventDefault();
-  changeViewDisplay('#signup_layout');
-};
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(5)(undefined);
+exports = module.exports = __webpack_require__(3)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, "body{margin:0}.hide{display:none!important}div.small{position:relative;width:100%;height:450px;margin-bottom:10px;display:inline-block}div.ab_button{position:absolute}iframe{width:100%;height:inherit}div.full{position:fixed;top:0;left:0;background:#fff;width:100%;height:100%}iframe{border-width:0}", ""]);
+exports.push([module.i, "body{margin:0}html{height:100%}.hide{display:none!important}.left{width:300px}.left,.right{height:inherit}.right{width:calc(100% - 300px)}.main{width:100%;height:100%;position:relative}.fl,.main{float:left}.fr{float:right}ul.menu{list-style-type:none;padding:0;text-align:center}ul.menu,ul.menu li{width:100%}ul.menu a{width:inherit;text-overflow:ellipsis;overflow:hidden;display:inline-block}ul.menu a:hover{background-color:gray}", ""]);
 
 // exports
 
 
 /***/ }),
-/* 5 */
+/* 3 */
 /***/ (function(module, exports) {
 
 /*
@@ -452,7 +327,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 6 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -498,7 +373,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(7);
+var	fixUrls = __webpack_require__(5);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -811,7 +686,7 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
-/* 7 */
+/* 5 */
 /***/ (function(module, exports) {
 
 
@@ -904,6 +779,131 @@ module.exports = function (css) {
 	return fixedCss;
 };
 
+
+/***/ }),
+/* 6 */,
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var style = __webpack_require__(1);
+style.use();
+var cm = __webpack_require__(0);
+
+function signIn(id, password) {
+  if (!firebase.auth().currentUser) {
+    firebase.auth().signInWithEmailAndPassword(id, password).catch(function (error) {
+      console.log(error);
+      alert(error);
+    });
+  } else {
+    console.log("already login");
+  }
+}
+
+function signUp(id, password) {
+  if (!firebase.auth().currentUser) {
+    firebase.auth().createUserWithEmailAndPassword(id, password).catch(function (error) {
+      console.log(error);
+      alert(error);
+    });
+  } else {
+    console.log("already login");
+  }
+}
+
+function signOut() {
+  if (firebase.auth().currentUser) {
+    firebase.auth().signOut().catch(function (error) {
+      alert(error);
+      console.log(error);
+    });
+  } else {
+    console.log("already SignOut");
+  }
+}
+
+firebase.auth().onAuthStateChanged(function (user) {
+  if (user) {
+
+    var cell = cm._q('.data');
+    while (cell.hasChildNodes()) {
+      cell.removeChild(cell.firstChild);
+    }
+    console.log("login");
+    var table = firebase.database().ref('/menu');
+    var div = cm._q('#main_layout .data');
+    table.on('child_added', function (data) {
+      console.log("dataAdd");
+      var temp = document.createElement('div');
+      temp.classList.add(data.key);
+      temp.innerHTML = data.val();
+      div.append(temp);
+    });
+    table.on('child_changed', function (data) {
+      console.log(data.key);
+      var temp = div.querySelector('.' + data.key);
+      temp.innerHTML = data.val();
+    });
+    table.on('child_removed', function (data) {
+      cm._q('.' + data.key).remove();
+    });
+    cm.changeViewDisplay('#main_layout');
+  } else {
+    cm.changeViewDisplay('#signin_layout');
+    console.log("need login");
+  }
+});
+
+cm._q('#main_layout ._input_btn').onclick = function (e) {
+  var el_text = cm._q('#main_layout ._input');
+  var text = cm._q('#main_layout ._input').value;
+  if (text.trim() != "") {
+    var database = firebase.database();
+    if (database) {
+      database.ref("/menu").push(text).then(function (e) {
+        el_text.value = "";
+        console.log("success", e);
+      }).catch(function (e) {
+        console.log("error", e);
+      });
+    }
+  }
+};
+
+cm._q('#sign_out ._signout').onclick = function (e) {
+  e.preventDefault();
+  signOut();
+};
+
+cm._q('#signup_layout ._signup').onclick = function (e) {
+  e.preventDefault();
+  cm.validCheck('#signup_layout');
+  var els = cm._qs('#signup_layout .valid_fail');
+  if (els.length == 0) {
+    var id = cm._q('#signup_layout ._user_id').value;
+    var pw = cm._q('#signup_layout ._user_password').value;
+    signUp(id, pw);
+  }
+};
+
+cm._q('#signin_layout ._signin').onclick = function (e) {
+  e.preventDefault();
+  cm.validCheck('#signin_layout');
+  var els = cm._qs('#signin_layout .valid_fail');
+  if (els.length == 0) {
+    var id = cm._q('#signin_layout ._user_id').value;
+    var pw = cm._q('#signin_layout ._user_password').value;
+    signIn(id, pw);
+  }
+};
+
+cm._q('#signin_layout ._signup').onclick = function (e) {
+  e.preventDefault();
+  changeViewDisplay('#signup_layout');
+};
 
 /***/ })
 /******/ ]);

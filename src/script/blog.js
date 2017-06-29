@@ -54,7 +54,28 @@ function hashToValue() {
   }
   return data;
 }
-// saveData("-KnDOM9a_QVwAZXjj2SV", "test", "<head></head>")
+// saveData("-KnhPm67thcpzcZo_HuE", "test", "<head>2</head>")
+loadPost("-KnhPm67thcpzcZo_HuE")
+
+function loadPost(menu) {
+  database.ref("/board/" + menu + "/data").orderByChild('createDate').limitToLast(1).once("value").then(function(data) {
+    var snap = data.val();
+    var firstData;
+    for (var key in snap) {
+      if (snap.hasOwnProperty(key)) {
+        firstData = snap[key];
+        break;
+      }
+    }
+    if(firstData){
+      // console.log(firstData.data)
+      cm._q('div.post .title').innerHTML= firstData.title;
+      cm._q('div.post .data').innerHTML= firstData.data;
+    }
+    // data.val()[0].data
+    // cm._q('div.post').innerHTML= data.val()[0];
+  })
+}
 
 function saveData(menu, title, data) {
   let saveData = new postData();
