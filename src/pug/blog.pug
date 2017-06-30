@@ -1,13 +1,15 @@
 extends layout
 
 block content
+  .loading.hide 
+    div
   .main
     .left.fl
       div
         ul.menu
-    .right.fl
+    .right.fr
       div.write
       div.post
-        .title
+        .title(data-fixture data-name="article-title")
         .data
   script(src="/js/blog.js")

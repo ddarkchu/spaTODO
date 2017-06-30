@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 function pugPage(name) {
   return new HtmlWebpackPlugin({
@@ -60,6 +61,10 @@ module.exports = {
   },
   plugins: [
     pugPage('index'),
-    pugPage('blog')
+    pugPage('blog'),
+    new CopyWebpackPlugin([{
+      from: "src/plugin/contentTools",
+      to: "contentTools/"
+    }])
   ]
 }

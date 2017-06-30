@@ -11,8 +11,9 @@ html {
 }
 
 .left {
+  position: fixed;
   height: inherit;
-  /*background-color: red;*/
+  background-color: red;
   width: 300px;
 }
 
@@ -39,20 +40,53 @@ html {
 
 ul.menu {
   list-style-type: none;
-  padding:0;
+  padding: 0;
   /*text-overflow: ellipsis; */
-  width:100%;
+  width: 100%;
   text-align: center;
 }
-ul.menu li{
-  width:100%;
+
+ul.menu li {
+  width: 100%;
 }
-ul.menu a{
-  width:inherit;
+
+ul.menu a {
+  width: inherit;
   text-overflow: ellipsis;
   overflow: hidden;
   display: inline-block;
 }
-ul.menu a:hover{
+
+ul.menu a:hover {
   background-color: gray;
+}
+
+div.loading {
+  position: absolute;
+  width: 100%;
+  z-index: 999;
+  text-align: center;
+  height: 100%;
+  line-height: 320pt;
+  background-color: black;
+  opacity: 0.4;
+  color: white;
+}
+
+div.loading>div::after {
+  content: "Loading";
+  animation: changeLetter 3s linear infinite alternate;
+  /*content:"loading";*/
+}
+
+@keyframes changeLetter {
+  0% {
+    font-size: 10pt;
+  }
+  50% {
+    font-size: 15pt;
+  }
+  100% {
+    font-size: 20pt;
+  }
 }

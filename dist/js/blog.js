@@ -239,7 +239,7 @@ exports = module.exports = __webpack_require__(3)(undefined);
 
 
 // module
-exports.push([module.i, "body{margin:0}html{height:100%}.hide{display:none!important}.left{width:300px}.left,.right{height:inherit}.right{width:calc(100% - 300px)}.main{width:100%;height:100%;position:relative}.fl,.main{float:left}.fr{float:right}ul.menu{list-style-type:none;padding:0;text-align:center}ul.menu,ul.menu li{width:100%}ul.menu a{width:inherit;text-overflow:ellipsis;overflow:hidden;display:inline-block}ul.menu a:hover{background-color:gray}", ""]);
+exports.push([module.i, "body{margin:0}html{height:100%}.hide{display:none!important}.left{position:fixed;background-color:red;width:300px}.left,.right{height:inherit}.right{width:calc(100% - 300px)}.main{width:100%;height:100%;position:relative}.fl,.main{float:left}.fr{float:right}ul.menu{list-style-type:none;padding:0;text-align:center}ul.menu,ul.menu li{width:100%}ul.menu a{width:inherit;text-overflow:ellipsis;overflow:hidden;display:inline-block}ul.menu a:hover{background-color:gray}", ""]);
 
 // exports
 
@@ -805,11 +805,6 @@ var loadMenu = new Promise(function loadMenu(resolve, reject) {
         a.appendChild(label);
         a.setAttribute("href", "#menu=" + key);
         a.setAttribute("title", data[key]);
-        a.onclick = function (key) {
-          return function () {
-            console.log(key);
-          };
-        }(key);
         var li = document.createElement("li");
         li.appendChild(a);
         ul.appendChild(li);
@@ -865,7 +860,31 @@ function hashToValue() {
 
   return data;
 }
-// saveData("-KnDOM9a_QVwAZXjj2SV", "test", "<head></head>")
+// saveData("-KnhPm67thcpzcZo_HuE", "test", "<head>2</head>")
+
+
+function loadPost(menu) {
+  database.ref("/board/" + menu + "/data").orderByChild('createDate').limitToLast(1).once("value").then(function (data) {
+    var snap = data.val();
+    var firstData;
+    for (var key in snap) {
+      if (snap.hasOwnProperty(key)) {
+        firstData = snap[key];
+        break;
+      }
+    }
+    if (firstData) {
+      // console.log(firstData.data)
+      cm._q('div.post .title').innerHTML = firstData.title;
+      cm._q('div.post .data').innerHTML = firstData.data;
+    } else {
+      cm._q('div.post .title').innerHTML = "";
+      cm._q('div.post .data').innerHTML = "";
+    }
+    // data.val()[0].data
+    // cm._q('div.post').innerHTML= data.val()[0];
+  });
+}
 
 function saveData(menu, title, data) {
   var saveData = new postData();
@@ -924,6 +943,9 @@ function saveMenu(menu) {
 }
 
 document.body.onhashchange = function () {
+  var t = hashToValue();
+
+  loadPost(t.menu);
   console.log("fdsa");
 };
 

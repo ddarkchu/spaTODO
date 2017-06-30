@@ -16,11 +16,6 @@ var loadMenu = new Promise(function loadMenu(resolve, reject) {
         a.appendChild(label);
         a.setAttribute("href", "#menu=" + key);
         a.setAttribute("title", data[key]);
-        a.onclick = ((key) => {
-          return () => {
-            console.log(key)
-          };
-        })(key);
         var li = document.createElement("li");
         li.appendChild(a);
         ul.appendChild(li);
@@ -55,7 +50,7 @@ function hashToValue() {
   return data;
 }
 // saveData("-KnhPm67thcpzcZo_HuE", "test", "<head>2</head>")
-loadPost("-KnhPm67thcpzcZo_HuE")
+
 
 function loadPost(menu) {
   database.ref("/board/" + menu + "/data").orderByChild('createDate').limitToLast(1).once("value").then(function(data) {
@@ -67,10 +62,15 @@ function loadPost(menu) {
         break;
       }
     }
-    if(firstData){
+    if (firstData) {
       // console.log(firstData.data)
-      cm._q('div.post .title').innerHTML= firstData.title;
-      cm._q('div.post .data').innerHTML= firstData.data;
+      let p = document.createElement('p');
+      p.appendChild(document.createTextNode(firstData.title));
+      cm._q('div.post .title').appendChild(p);
+      cm._q('div.post .data').innerHTML = firstData.data;
+    } else {
+      cm._q('div.post .title').innerHTML = "";
+      cm._q('div.post .data').innerHTML = "";
     }
     // data.val()[0].data
     // cm._q('div.post').innerHTML= data.val()[0];
@@ -138,5 +138,16 @@ function saveMenu(menu) {
 
 
 document.body.onhashchange = () => {
+  var t = hashToValue();
+
+  loadPost(t.menu)
   console.log("fdsa")
+}
+
+window.onload = function(){
+  var FIXTURE_TOOLS, editor, req;
+    // ContentTools.IMAGE_UPLOADER = ImageUploader.createImageUploader;
+    // ContentTools.StylePalette.add([new ContentTools.Style('By-line', 'article__by-line', ['p']), new ContentTools.Style('Caption', 'article__caption', ['p']), new ContentTools.Style('Example', 'example', ['pre']), new ContentTools.Style('Example + Good', 'example--good', ['pre']), new ContentTools.Style('Example + Bad', 'example--bad', ['pre'])]);
+    // editor = ContentTools.EditorApp.get();
+    // editor.init('[data-editable], [data-fixture]', 'data-name');
 }

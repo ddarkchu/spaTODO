@@ -239,7 +239,7 @@ exports = module.exports = __webpack_require__(3)(undefined);
 
 
 // module
-exports.push([module.i, "body{margin:0}html{height:100%}.hide{display:none!important}.left{width:300px}.left,.right{height:inherit}.right{width:calc(100% - 300px)}.main{width:100%;height:100%;position:relative}.fl,.main{float:left}.fr{float:right}ul.menu{list-style-type:none;padding:0;text-align:center}ul.menu,ul.menu li{width:100%}ul.menu a{width:inherit;text-overflow:ellipsis;overflow:hidden;display:inline-block}ul.menu a:hover{background-color:gray}", ""]);
+exports.push([module.i, "body{margin:0}html{height:100%}.hide{display:none!important}.left{position:fixed;background-color:red;width:300px}.left,.right{height:inherit}.right{width:calc(100% - 300px)}.main{width:100%;height:100%;position:relative}.fl,.main{float:left}.fr{float:right}ul.menu{list-style-type:none;padding:0;text-align:center}ul.menu,ul.menu li{width:100%}ul.menu a{width:inherit;text-overflow:ellipsis;overflow:hidden;display:inline-block}ul.menu a:hover{background-color:gray}", ""]);
 
 // exports
 
