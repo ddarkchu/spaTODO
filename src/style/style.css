@@ -11,16 +11,25 @@ html {
 }
 
 .left {
+  z-index: 1;
+  -moz-transition: all 1s;
+  -webkit-transition: all 1s;
+  -ms-transition: all 1s;
+  -o-transition: all 1s;
+  transition: all 1s;
   position: fixed;
   height: inherit;
   background-color: red;
   width: 300px;
+  left: 0px;
+  background: darkgray;
 }
 
 .right {
   height: inherit;
   /*background-color: green;*/
-  width: calc(100% - 300px);
+  max-width: 920px;
+  margin: 0 auto;
 }
 
 .main {
@@ -38,10 +47,14 @@ html {
   float: right;
 }
 
+.main.left_hide .left {
+  left: -300px;
+  /*display: none;*/
+}
+
 ul.menu {
   list-style-type: none;
   padding: 0;
-  /*text-overflow: ellipsis; */
   width: 100%;
   text-align: center;
 }
@@ -64,7 +77,7 @@ ul.menu a:hover {
 div.loading {
   position: absolute;
   width: 100%;
-  z-index: 999;
+  z-index: 9999999;
   text-align: center;
   height: 100%;
   line-height: 320pt;
@@ -89,4 +102,52 @@ div.loading>div::after {
   100% {
     font-size: 20pt;
   }
+}
+
+.menu_icon {
+  position: fixed;
+  display: block;
+  bottom: 0;
+  z-index: 1;
+}
+
+.menu_icon>div {
+  bottom: 50px;
+  width: 48px;
+  height: 48px;
+  background: gray;
+  border-radius: 30%;
+  left: 10px;
+  position: absolute;
+  display: block;
+}
+
+.menu_icon>div>i {
+  line-height: 48px;
+  font-size: 38px;
+  color: white;
+  cursor: pointer;
+}
+
+.menu_icon>div.new_post {
+  background-color: indianred;
+  bottom: 100px;
+  line-height: 48px;
+  font-size: 20px;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.menu_icon>div.new_post:hover {
+  color: black;
+}
+
+.menu_icon>div>i:hover {
+  color: black;
+}
+
+.left .version {
+  bottom: 0px;
+  position: fixed;
 }

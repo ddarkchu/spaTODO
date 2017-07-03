@@ -1,15 +1,20 @@
 extends layout
 
 block content
-  .loading.hide 
+  .loading 
     div
-  .main
-    .left.fl
+  .main.left_hide
+    .left
       div
         ul.menu
-    .right.fr
+      div.version v0.1_2017-07-03
+    .right
       div.write
       div.post
-        .title(data-fixture data-name="article-title")
-        .data
+        h1.title(data-fixture data-name="title")
+        .data(data-editable data-name="data")
+  .menu_icon
+    div
+      i.terminal.icon
+    div.new_post.hide new
   script(src="/js/blog.js")
