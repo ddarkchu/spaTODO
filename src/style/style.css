@@ -124,7 +124,7 @@ div.loading>div::after {
 
 .menu_icon>div>i {
   line-height: 48px;
-  font-size: 38px;
+  font-size: 35px;
   color: white;
   cursor: pointer;
 }
@@ -139,12 +139,33 @@ div.loading>div::after {
   cursor: pointer;
 }
 
+@media (max-width: 1000px) {
+  .menu_icon>div {
+    width: 80px;
+    height: 80px;
+  }
+  .menu_icon>div>i {
+    line-height: 80px;
+    font-size: 5em;
+  }
+  .menu_icon>div.new_post {
+    bottom: 135px;
+    line-height: 80px;
+    font-size: 35px;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+  }
+}
+
 .menu_icon>div.new_post:hover {
   color: black;
 }
 
 .menu_icon>div>i:hover {
-  color: black;
+  -ms-transform: rotate(-10deg);
+  -webkit-transform: rotate(-10deg);
+  transform: rotate(-10deg);
 }
 
 .left .version {

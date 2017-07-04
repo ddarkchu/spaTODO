@@ -239,7 +239,7 @@ exports = module.exports = __webpack_require__(3)(undefined);
 
 
 // module
-exports.push([module.i, "body{margin:0}html{height:100%}.hide{display:none!important}.left{position:fixed;background-color:red;width:300px}.left,.right{height:inherit}.right{width:calc(100% - 300px)}.main{width:100%;height:100%;position:relative}.fl,.main{float:left}.fr{float:right}ul.menu{list-style-type:none;padding:0;text-align:center}ul.menu,ul.menu li{width:100%}ul.menu a{width:inherit;text-overflow:ellipsis;overflow:hidden;display:inline-block}ul.menu a:hover{background-color:gray}", ""]);
+exports.push([module.i, "body{margin:0}html{height:100%}.hide{display:none!important}.left{z-index:1;-moz-transition:all 1s;-webkit-transition:all 1s;-ms-transition:all 1s;-o-transition:all 1s;transition:all 1s;position:fixed;background-color:red;width:300px;left:0;background:#a9a9a9}.left,.right{height:inherit}.right{max-width:920px;margin:0 auto}.main{width:100%;height:100%;position:relative}.fl,.main{float:left}.fr{float:right}.main.left_hide .left{left:-300px}ul.menu{list-style-type:none;padding:0;text-align:center}ul.menu,ul.menu li{width:100%}ul.menu a{width:inherit;text-overflow:ellipsis;overflow:hidden;display:inline-block}ul.menu a:hover{background-color:gray}div.loading{position:absolute;width:100%;z-index:9999999;text-align:center;height:100%;line-height:320pt;background-color:#000;opacity:.4;color:#fff}div.loading>div:after{content:\"Loading\";animation:changeLetter 3s linear infinite alternate}@keyframes changeLetter{0%{font-size:10pt}50%{font-size:15pt}to{font-size:20pt}}.menu_icon{position:fixed;display:block;bottom:0;z-index:1}.menu_icon>div{bottom:50px;width:48px;height:48px;background:gray;border-radius:30%;left:10px;position:absolute;display:block}.menu_icon>div>i{font-size:35px}.menu_icon>div.new_post,.menu_icon>div>i{line-height:48px;color:#fff;cursor:pointer}.menu_icon>div.new_post{background-color:#cd5c5c;bottom:100px;font-size:20px;text-align:center}@media (max-width:1000px){.menu_icon>div{width:80px;height:80px}.menu_icon>div>i{line-height:80px;font-size:5em}.menu_icon>div.new_post{bottom:135px;line-height:80px;font-size:35px;color:#fff;text-align:center;cursor:pointer}}.menu_icon>div.new_post:hover,.menu_icon>div>i:hover{color:#000}.left .version{bottom:0;position:fixed}", ""]);
 
 // exports
 
@@ -805,6 +805,20 @@ var loadMenu = new Promise(function loadMenu(resolve, reject) {
         a.appendChild(label);
         a.setAttribute("href", "#menu=" + key);
         a.setAttribute("title", data[key]);
+        a.onclick = function (key) {
+          return function () {
+            console.log(key);
+            if (location.hash == "#menu=" + key) {
+              cm.show(cm._q(".loading"));
+              loadPost({
+                menu: key
+              }).then(function () {
+                cm.hide(cm._q(".loading"));
+              });
+            }
+          };
+        }(key);
+        //
         var li = document.createElement("li");
         li.appendChild(a);
         ul.appendChild(li);
@@ -817,7 +831,10 @@ var loadMenu = new Promise(function loadMenu(resolve, reject) {
   });
 });
 loadMenu.then(function () {
-  cm.show(cm._q("body"));
+  var t = hashToValue();
+  loadPost(t).then(function () {
+    cm.hide(cm._q(".loading"));
+  });
 });
 // menu 메뉴 id
 // postId 게시글 아이디
@@ -860,70 +877,128 @@ function hashToValue() {
 
   return data;
 }
-// saveData("-KnhPm67thcpzcZo_HuE", "test", "<head>2</head>")
+// saveData("-KnhPm67thcpzcZo_HuE", "firebase이용 개발", "realtime database 기존 디비에 비해 제약사항이 너무 많아서 생각해야 할것이 많다.");
 
+function setPost() {
+  var menu = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+  var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+  var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {
+    title: "",
+    data: "",
+    createData: 0
+  };
 
-function loadPost(menu) {
-  database.ref("/board/" + menu + "/data").orderByChild('createDate').limitToLast(1).once("value").then(function (data) {
-    var snap = data.val();
-    var firstData;
-    for (var key in snap) {
-      if (snap.hasOwnProperty(key)) {
-        firstData = snap[key];
-        break;
+  var title = cm._q('div.post .title');
+  var divData = cm._q('div.post .data');
+  title.className = "title";
+  title.setAttribute('menu_id', menu);
+  title.setAttribute('post_id', id);
+  title.innerHTML = data.title;
+  divData.innerHTML = data.data;
+}
+
+function loadPost(params) {
+
+  return new Promise(function (sucess, fail) {
+    var editor = ContentTools.EditorApp.get();
+    if (editor._ignition) {
+      editor._ignition.cancel();
+      if (editor.getState() == "editing") {
+        menuHide();
+        sucess();
+        return;
       }
     }
-    if (firstData) {
-      // console.log(firstData.data)
-      cm._q('div.post .title').innerHTML = firstData.title;
-      cm._q('div.post .data').innerHTML = firstData.data;
+    if (params.menu) {
+
+      if (params.post) {
+        database.ref("/board/" + params.menu + "/data/" + params.post).once("value").then(function (snap) {
+          if (snap.val()) {
+            setPost(params.menu, params.post, snap.val());
+          } else {
+            alert("해당 글이 없습니다.");
+            setPost();
+          }
+          menuHide();
+          sucess();
+        });
+      } else {
+        database.ref("/board/" + params.menu + "/data/").orderByChild('createDate').limitToLast(1).once("value").then(function (data) {
+          var snap = data.val();
+          var firstData = void 0;
+          for (var key in snap) {
+            if (snap.hasOwnProperty(key)) {
+              firstData = snap[key];
+              firstData['postId'] = key;
+              break;
+            }
+          }
+          setPost(params.menu, firstData.postId, firstData);
+          menuHide();
+          sucess();
+        });
+      }
     } else {
-      cm._q('div.post .title').innerHTML = "";
-      cm._q('div.post .data').innerHTML = "";
+      var menu = document.querySelector('.menu li:nth-child(1) > a');
+      if (menu) menu.click();
+      return;
     }
-    // data.val()[0].data
-    // cm._q('div.post').innerHTML= data.val()[0];
   });
 }
 
 function saveData(menu, title, data) {
-  var saveData = new postData();
-  saveData.title = title;
-  saveData.data = data;
-  saveData.createDate = new Date().getTime();
+  return new Promise(function (s, f) {
+    var saveData = new postData();
+    saveData.title = title;
+    saveData.data = data;
+    saveData.createDate = new Date().getTime();
 
-  database.ref("/board/" + menu + "/boardTime").transaction(function (boardTime) {
+    database.ref("/board/" + menu + "/boardTime").transaction(function (boardTime) {
 
-    if (!boardTime || boardTime < saveData.createDate) {
-      boardTime = saveData.createDate;
-    }
-    return boardTime;
-  }, function (error, committed, snapshot) {
-    if (error) {
-      console.log('Transaction failed abnormally!', error);
-    } else if (!committed) {
-      console.log('We aborted the transaction (because ada already exists).');
-    } else {
-      if (snapshot.val() == saveData.createDate) {
-        database.ref("/board/" + menu + "/boardCount").transaction(function (boardCount) {
-          if (!boardCount) {
-            boardCount = 0;
-          }
-          return boardCount + 1;
-        }, function (error, committed, snapshot) {
-          if (error) {
-            console.log('Transaction failed abnormally!', error);
-          } else if (!committed) {
-            console.log('We aborted the transaction (because ada already exists).');
-          } else {
-            database.ref("/board/" + menu + "/data").push(saveData);
-          }
-        });
-      } else {}
-    }
+      if (!boardTime || boardTime < saveData.createDate) {
+        boardTime = saveData.createDate;
+      } else {
+        boardTime = undefined;
+      }
+      return boardTime;
+    }, function (error, committed, snapshot) {
+      if (error) {
+        console.log('Transaction failed abnormally!', error);
+      } else if (!committed) {
+        console.log('We aborted the transaction (because ada already exists).');
+      } else {
+        if (snapshot.val() == saveData.createDate) {
+          database.ref("/board/" + menu + "/boardCount").transaction(function (boardCount) {
+            if (!boardCount) {
+              boardCount = 0;
+            }
+            return boardCount + 1;
+          }, function (error, committed, snapshot) {
+            if (error) {
+              console.log('Transaction failed abnormally!', error);
+              s();
+            } else if (!committed) {
+              console.log('We aborted the transaction (because ada already exists).');
+              s();
+            } else {
+              database.ref("/board/" + menu + "/data").push(saveData).then(function (snap) {
+                var title = cm._q('title');
+                if (title) {
+                  title.setAttribute("post_id", snap.getKey());
+                  s();
+                }
+              });
+            }
+          });
+        } else {
+          s();
+        }
+      }
+    });
   });
 }
-// saveMenu("test")
+// saveMenu("test2");
+
 function saveMenu(menu) {
   var menuCount = database.ref("/menu/menuCount");
   return menuCount.transaction(function (menuCount) {
@@ -936,18 +1011,149 @@ function saveMenu(menu) {
       console.log('Transaction failed abnormally!', error);
     } else if (!committed) {
       console.log('We aborted the transaction (because ada already exists).');
-    } else {
-      database.ref("/menu/data").push(menu);
     }
+  }).then(function () {
+    return database.ref("/menu/data").push(menu);
+  }).catch(function () {
+    menuCount.transaction(function (menuCount) {
+      if (!menuCount) {
+        menuCount = 1;
+      }
+      return menuCount - 1;
+    }, function (error, committend, snapshot) {
+      if (error || !committed) {
+        console.log('server error');
+      }
+    });
   });
 }
 
 document.body.onhashchange = function () {
   var t = hashToValue();
-
-  loadPost(t.menu);
-  console.log("fdsa");
+  cm.show(cm._q(".loading"));
+  loadPost(t).then(function () {
+    cm.hide(cm._q(".loading"));
+  }).catch(function () {
+    cm.hide(cm._q(".loading"));
+  });
 };
+
+firebase.auth().onAuthStateChanged(function (user) {
+  if (user) {
+    contentTools();
+  }
+});
+newData();
+
+function newData() {
+
+  cm._q('.menu_icon .new_post').onclick = function () {
+    menuHide();
+    var temp = hashToValue();
+    var editor = ContentTools.EditorApp.get();
+    var title = cm._q('div.post .title');
+    var divData = cm._q('div.post .data');
+    title.setAttribute('menu_id', temp.menu);
+    title.setAttribute('post_id', "");
+    title.innerHTML = "";
+    divData.innerHTML = "";
+    if (editor.getState() != "editing") ;
+    cm._q('.ct-ignition__button.ct-ignition__button--edit').click();
+  };
+}
+
+function contentTools() {
+  var editor = ContentTools.EditorApp.get();
+  if (editor && firebase.auth().currentUser) {
+    cm.show(cm._q(".menu_icon .new_post"));
+    editor.init('[data-editable], [data-fixture]', 'data-name');
+    editor.addEventListener('stop', function (ev) {
+      var title = cm._q('div.post .title');
+      title.className = "title";
+    });
+    editor.addEventListener('saved', function (ev) {
+      var data = ev.detail().regions;
+      if (Object.keys(data).length === 0) {
+        return;
+      }
+      // let menu = hashToValue();
+      var postId = cm._q('.post .title').getAttribute("post_id");
+      var menu = cm._q('.post .title').getAttribute("menu_id");
+      cm.show(cm._q('.loading'));
+      editor.busy(true);
+      if (menu && postId) {
+        firebase.database().ref("/board/" + menu + "/data/" + postId).update(data).then(function () {
+          editor.busy(false);
+          cm.hide(cm._q('.loading'));
+        }).catch(function () {
+          editor.busy(false);
+          cm.hide(cm._q('.loading'));
+        });
+      } else if (menu) {
+        saveData(menu, data.title, data.data).then(function () {
+          editor.busy(false);
+          cm.hide(cm._q('.loading'));
+        });
+      }
+    });
+  }
+}
+initMenuButton();
+
+function initMenuButton() {
+  var div = cm._q('.menu_icon .terminal.icon').parentElement;
+  div.onclick = function () {
+    var main = cm._q('.main');
+    if (main.className.indexOf("left_hide") >= 0) {
+      main.classList.remove('left_hide');
+    } else {
+      main.classList.add('left_hide');
+    }
+  };
+}
+
+// window.onload = function() {
+//
+//     FIXTURE_TOOLS = [['undo', 'redo', 'remove']];
+//     ContentEdit.Root.get().bind('focus', function(element) {
+//       var tools;
+//       if (element.isFixed()) {
+//         tools = FIXTURE_TOOLS;
+//       } else {
+//         tools = ContentTools.DEFAULT_TOOLS;
+//       }
+//       if (editor.toolbox().tools() !== tools) {
+//         return editor.toolbox().tools(tools);
+//       }
+//     });
+//     req = new XMLHttpRequest();
+//     req.overrideMimeType('application/json');
+//     req.open('GET', 'https://raw.githubusercontent.com/GetmeUK/ContentTools/master/translations/lp.json', true);
+//     return req.onreadystatechange = function(ev) {
+//       var translations;
+//       if (ev.target.readyState === 4) {
+//         translations = JSON.parse(ev.target.responseText);
+//         ContentEdit.addTranslations('lp', translations);
+//         return ContentEdit.LANGUAGE = 'lp';
+//       }
+//     };
+//   };
+//
+// }).call(this);
+//
+function menuHide() {
+  var main = cm._q('.main');
+  if (main.className.indexOf("left_hide") < 0) {
+    main.classList.add('left_hide');
+  }
+}
+
+function menuShow() {
+  var main = cm._q('.main');
+  if (main.className.indexOf("left_hide") >= 0) {
+    main.classList.remove('left_hide');
+  }
+}
 
 /***/ })
 /******/ ]);

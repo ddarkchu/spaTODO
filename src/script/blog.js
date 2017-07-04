@@ -68,6 +68,30 @@ function hashToValue() {
 }
 // saveData("-KnhPm67thcpzcZo_HuE", "firebase이용 개발", "realtime database 기존 디비에 비해 제약사항이 너무 많아서 생각해야 할것이 많다.");
 
+function setPost(menu = "", id = "", data = {
+  title: "",
+  data: "",
+  createData: 0
+}) {
+  let title = cm._q('div.post .title');
+  let divData = cm._q('div.post .data');
+  title.className = "title";
+  title.setAttribute('menu_id', menu);
+  title.setAttribute('post_id', id);
+  title.innerHTML = data.title;
+  divData.innerHTML = data.data;
+}
+
+function getPrevNext(key, time) {
+  //최신
+  database.ref("/board/-KnhPm67thcpzcZo_HuE/data/").orderByChild('createDate').startAt(1499136043316).limitToFirst(2).once('value').then((snap) => {
+    console.log(snap.val())
+  })
+  //과거
+  database.database().ref("/board/-KnhPm67thcpzcZo_HuE/data/").orderByChild('createDate').endAt(1499136043316).limitToLast(2).once('value').then((snap) => {
+    console.log(snap.val())
+  })
+}
 
 function loadPost(params) {
 
@@ -83,36 +107,35 @@ function loadPost(params) {
       }
     }
     if (params.menu) {
-      database.ref("/board/" + params.menu + "/data").orderByChild('createDate').limitToLast(1).once("value").then(function(data) {
-        let snap = data.val();
-        let firstData;
-        for (let key in snap) {
-          if (snap.hasOwnProperty(key)) {
-            firstData = snap[key];
-            firstData['postId'] = key;
-            break;
+
+      if (params.post) {
+        database.ref("/board/" + params.menu + "/data/" + params.post).once("value").then((snap) => {
+          if (snap.val()) {
+            setPost(params.menu, params.post, snap.val());
+          } else {
+            alert("해당 글이 없습니다.");
+            setPost();
           }
-        }
-        let title = cm._q('div.post .title');
-        let divData = cm._q('div.post .data');
-        title.innerHTML = "";
-        title.className = "title";
-        if (firstData) {
-          title.setAttribute('post_id', firstData['postId']);
-          title.setAttribute('menu_id', params.menu);
-          let p = document.createElement('p');
-          p.appendChild(document.createTextNode(firstData.title));
-          title.setAttribute('post_id', firstData['postId']);
-          title.appendChild(p);
-          divData.innerHTML = firstData.data;
-        } else {
-          divData.innerHTML = "";
-          title.setAttribute('post_id', "");
-          title.setAttribute('menu_id', "");
-        }
-        menuHide();
-        sucess();
-      });
+          menuHide();
+          sucess();
+        });
+      } else {
+        database.ref("/board/" + params.menu + "/data/").orderByChild('createDate').limitToLast(1).once("value").then(function(data) {
+          let snap = data.val();
+          let firstData;
+          for (let key in snap) {
+            if (snap.hasOwnProperty(key)) {
+              firstData = snap[key];
+              firstData['postId'] = key;
+              break;
+            }
+          }
+          setPost(params.menu, firstData.postId, firstData);
+          menuHide();
+          sucess();
+        });
+      }
+
 
     } else {
       let menu = document.querySelector('.menu li:nth-child(1) > a');
@@ -159,10 +182,11 @@ function saveData(menu, title, data) {
               console.log('We aborted the transaction (because ada already exists).');
               s();
             } else {
-              database.ref("/board/" + menu + "/data").push(saveData).then((snap) => {
+              var postId = snapshot.val();
+              database.ref("/board/" + menu + "/data/"+postId).set(saveData).then((snap) => {
                 let title = cm._q('title');
                 if (title) {
-                  title.setAttribute("post_id", snap.getKey());
+                  title.setAttribute("post_id", postId);
                   s();
                 }
               });
@@ -176,7 +200,8 @@ function saveData(menu, title, data) {
     });
   });
 }
-// saveMenu("test")
+// saveMenu("test2");
+
 function saveMenu(menu) {
   let menuCount = database.ref("/menu/menuCount");
   return menuCount.transaction(function(menuCount) {
@@ -189,17 +214,27 @@ function saveMenu(menu) {
       console.log('Transaction failed abnormally!', error);
     } else if (!committed) {
       console.log('We aborted the transaction (because ada already exists).');
-    } else {
-      console.log('test');
-      database.ref("/menu/data").push(menu);
     }
+  }).then(() => {
+    return database.ref("/menu/data").push(menu);
+  }).catch(() => {
+    menuCount.transaction(function(menuCount) {
+      if (!menuCount) {
+        menuCount = 1;
+      }
+      return menuCount - 1;
+    }, function(error, committend, snapshot) {
+      if (error || !committed) {
+        console.log('server error');
+      }
+    });
   });
 }
 
 document.body.onhashchange = () => {
   let t = hashToValue();
   cm.show(cm._q(".loading"));
-  loadPost(t.menu).then(() => {
+  loadPost(t).then(() => {
     cm.hide(cm._q(".loading"));
   }).catch(() => {
     cm.hide(cm._q(".loading"));
