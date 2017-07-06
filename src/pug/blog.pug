@@ -7,12 +7,13 @@ block content
     .left
       div
         ul.menu
-      div.version v0.1_2017-07-03
+      div.version= "v0.1_"+htmlWebpackPlugin.options.date
     .right
       div.write
       div.post
         h1.title(data-fixture data-name="title")
         .data(data-editable data-name="data")
+      .footer
   .menu_icon
     div
       i.terminal.icon(title="Menu")

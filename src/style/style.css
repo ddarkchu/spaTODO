@@ -120,6 +120,7 @@ div.loading>div::after {
   left: 10px;
   position: absolute;
   display: block;
+  text-align: center;
 }
 
 .menu_icon>div>i {
@@ -135,9 +136,9 @@ div.loading>div::after {
   line-height: 48px;
   font-size: 20px;
   color: white;
-  text-align: center;
   cursor: pointer;
 }
+
 
 @media (max-width: 1000px) {
   .menu_icon>div {
@@ -146,7 +147,7 @@ div.loading>div::after {
   }
   .menu_icon>div>i {
     line-height: 80px;
-    font-size: 5em;
+    font-size: 35pt;
   }
   .menu_icon>div.new_post {
     bottom: 135px;
@@ -171,4 +172,8 @@ div.loading>div::after {
 .left .version {
   bottom: 0px;
   position: fixed;
+}
+
+.footer{
+  height: 300px;
 }

@@ -82,15 +82,25 @@ function setPost(menu = "", id = "", data = {
   divData.innerHTML = data.data;
 }
 
-function getPrevNext(key, time) {
-  //최신
-  database.ref("/board/-KnhPm67thcpzcZo_HuE/data/").orderByChild('createDate').startAt(1499136043316).limitToFirst(2).once('value').then((snap) => {
-    console.log(snap.val())
-  })
-  //과거
-  database.database().ref("/board/-KnhPm67thcpzcZo_HuE/data/").orderByChild('createDate').endAt(1499136043316).limitToLast(2).once('value').then((snap) => {
-    console.log(snap.val())
-  })
+function getOldCurrent(boardId, postId, old) {
+  cm.show(cm._q(".loading"));
+  // loadPost(t).then(() => {
+  //   cm.hide(cm._q(".loading"));
+  // }).catch(() => {
+  //   cm.hide(cm._q(".loading"));
+  // });
+  let db = database.ref("/board/" + boardId + "/data/");
+  if (postId) {
+    postId = +postId;
+    if (old) { //과거
+      postId = "" + (postId - 1);
+      return db.orderByKey().endAt(postId).limitToLast(1).once('value');
+    } else { //최신
+      postId = "" + (postId + 1);
+      return db.orderByKey().startAt(postId).limitToFirst(1).once('value');
+    }
+  }
+  return new Promise((s,f))
 }
 
 function loadPost(params) {
@@ -183,7 +193,7 @@ function saveData(menu, title, data) {
               s();
             } else {
               var postId = snapshot.val();
-              database.ref("/board/" + menu + "/data/"+postId).set(saveData).then((snap) => {
+              database.ref("/board/" + menu + "/data/" + postId).set(saveData).then((snap) => {
                 let title = cm._q('title');
                 if (title) {
                   title.setAttribute("post_id", postId);

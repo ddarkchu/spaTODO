@@ -3,10 +3,16 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+function getDate() {
+  let date = new Date();
+  return "" + date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+}
+
 function pugPage(name) {
   return new HtmlWebpackPlugin({
     filename: name + '.html',
     template: PATHS.pug + name + '.pug',
+    date: getDate(),
     inject: false
   })
 }
@@ -42,7 +48,7 @@ module.exports = {
       {
         test: /\.pug$/,
         exclude: /node_modules/,
-        loader: 'pug-loader'
+        loader: 'pug-loader',
       },
       {
         test: /\.css$/,
