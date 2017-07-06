@@ -735,16 +735,18 @@ img.align-right, iframe.align-right, video.align-right, .ce-element--type-image.
 .ct-widget.ct-ignition {
   /*top:0;*/
   bottom: 0;
+  left: 10px;
 }
 
 .ct-ignition__button--edit, .ct-ignition__button--busy, .ct-ignition__button--confirm {
-  bottom: 50px;
-  left: 48px;
+  bottom: 150px;
+  /*left: 48px;*/
 }
 
 .ct-widget .ct-ignition__button--cancel {
   bottom: 50px;
-  left: 102px;
+  left: 0px;
+  bottom: 200px;
 }
 
 @media (max-width: 1000px) {
@@ -755,9 +757,11 @@ img.align-right, iframe.align-right, video.align-right, .ce-element--type-image.
     font-size: 4em;
   }
   .ct-ignition__button--edit, .ct-ignition__button--busy, .ct-ignition__button--confirm {
-    left: 80px;
+    left: 0px;
+    bottom: 220px;
   }
   .ct-widget .ct-ignition__button--cancel {
-    left: 167px;
+    bottom: 305px;
+    left: 0px;
   }
 }

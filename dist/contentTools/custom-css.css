@@ -738,13 +738,13 @@ img.align-right, iframe.align-right, video.align-right, .ce-element--type-image.
 }
 
 .ct-ignition__button--edit, .ct-ignition__button--busy, .ct-ignition__button--confirm {
-  bottom: 50px;
-  left: 48px;
+  bottom: 130px;
+  /*left: 48px;*/
 }
 
 .ct-widget .ct-ignition__button--cancel {
   bottom: 50px;
-  left: 102px;
+  /*left: 102px;*/
 }
 
 @media (max-width: 1000px) {

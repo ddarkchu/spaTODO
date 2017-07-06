@@ -81,6 +81,16 @@ function setPost(menu = "", id = "", data = {
   title.innerHTML = data.title;
   divData.innerHTML = data.data;
 }
+// getOldCurrent("-KnhPm67thcpzcZo_HuE","6",true)
+// cm._q('.location .older').onclick = () => {
+//   let title = cm._q('.post .title');
+//   getOldCurrent(title.getAttribute("menu_id"), title.getAttribute("post_id"), true)
+// }
+//
+// cm._q('.location .newer').onclick = () => {
+//   let title = cm._q('.post .title');
+//   getOldCurrent(title.getAttribute("menu_id"), title.getAttribute("post_id"))
+// }
 
 function getOldCurrent(boardId, postId, old) {
   cm.show(cm._q(".loading"));
@@ -92,15 +102,31 @@ function getOldCurrent(boardId, postId, old) {
   let db = database.ref("/board/" + boardId + "/data/");
   if (postId) {
     postId = +postId;
+    var promise;
     if (old) { //과거
       postId = "" + (postId - 1);
-      return db.orderByKey().endAt(postId).limitToLast(1).once('value');
+      promise = db.orderByKey().endAt(postId).limitToLast(1).once('value');
     } else { //최신
       postId = "" + (postId + 1);
-      return db.orderByKey().startAt(postId).limitToFirst(1).once('value');
+      promise = db.orderByKey().startAt(postId).limitToFirst(1).once('value');
     }
+    promise.then((snap) => {
+      let data = snap.val();
+      if (data) {
+        let keys = Object.keys(data);
+        if (keys.length > 0) {
+          setPost(boardId, keys[0], data[keys[0]]);
+        }
+      } else {
+        alert("페이지가 없습니다.")
+      }
+    }).then(() => {
+      cm.hide(cm._q(".loading"));
+    })
+  } else {
+    cm.hide(cm._q(".loading"));
   }
-  return new Promise((s,f))
+  // return new Promise((s, f))
 }
 
 function loadPost(params) {
@@ -120,12 +146,17 @@ function loadPost(params) {
 
       if (params.post) {
         database.ref("/board/" + params.menu + "/data/" + params.post).once("value").then((snap) => {
-          if (snap.val()) {
-            setPost(params.menu, params.post, snap.val());
-          } else {
+          let data = {
+            menu: params.menu,
+            post: params.post,
+            data: snap.val()
+          };
+          if (!data.data) {
             alert("해당 글이 없습니다.");
-            setPost();
           }
+          setOldCurrent(data.menu, data.post).then(() => {
+            setPost(data.menu, data.post, data.data)
+          });
           menuHide();
           sucess();
         });
@@ -140,6 +171,7 @@ function loadPost(params) {
               break;
             }
           }
+          setOldCurrent(params.menu, firstData.postId);
           setPost(params.menu, firstData.postId, firstData);
           menuHide();
           sucess();
@@ -367,5 +399,46 @@ function menuShow() {
   let main = cm._q('.main');
   if (main.className.indexOf("left_hide") >= 0) {
     main.classList.remove('left_hide')
+  }
+}
+
+
+function setOldCurrent(boardId, postId) {
+  if (!postId) {
+    cm._q(".location").classList.add('hide');
+    return new Promise((s, f) => {
+      console.log("postId가 없음.");
+      f("postId가 없음.");
+    });
+  }
+  let db = database.ref("/board/" + boardId + "/data/");
+  if (postId) {
+    postId = +postId;
+    let promiseList = [];
+    promiseList.push(db.orderByKey().endAt("" + (postId - 1)).limitToLast(1).once('value')); //과거
+    promiseList.push(db.orderByKey().startAt("" + (postId + 1)).limitToFirst(1).once('value')); // 최신
+    return Promise.all(promiseList).then((snap) => {
+      for (let i = 0; i < snap.length; i++) {
+        let selector = ".location .newer";
+        if (i == 0) {
+          selector = ".location .older";
+        }
+        if (snap[i]) {
+          let data = snap[i].val();
+          if (data) {
+            let key = Object.keys(data);
+            if (key[0]) {
+              cm._q(selector).classList.remove('hide');
+              cm._q(selector).setAttribute("href", location.pathname + "#menu=" + boardId + "&post=" + key[0]);
+            }
+          } else {
+            cm._q(selector).classList.add('hide');
+          }
+        } else {
+          cm._q(selector).classList.add('hide');
+        }
+      }
+      cm._q(".location").classList.remove('hide');
+    })
   }
 }

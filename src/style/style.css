@@ -110,9 +110,9 @@ div.loading>div::after {
   bottom: 0;
   z-index: 1;
 }
-
 .menu_icon>div {
   bottom: 50px;
+  z-index: 1;
   width: 48px;
   height: 48px;
   background: gray;
@@ -159,9 +159,6 @@ div.loading>div::after {
   }
 }
 
-.menu_icon>div.new_post:hover {
-  color: black;
-}
 
 .menu_icon>div>i:hover {
   -ms-transform: rotate(-10deg);
