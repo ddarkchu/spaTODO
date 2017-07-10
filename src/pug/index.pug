@@ -1,29 +1,28 @@
 extends layout
 
 block content
-  #signin_layout.js_layout
+  .loading 
     div
+  .main.left_hide
+    .left
       div
-        label SignIn
-      div
-        input._user_id(type="email" placeholder="id" valid=".+")
-        input._user_password(type="password" placeholder="password" valid=".+")
-        input._signin(type="button" value="signIn")
-        input._signup(type="button" value="signUp")
-  #signup_layout.js_layout
-    div: label SignUp
-    div: input._user_id(type="email" placeholder="user@email.com")
-    div: input._user_password(type="password" placeholder="password")
-    div: input._signup(type="button" value="signUp")
-    div: input._signin(type="button" value="signIn")
-
-  #main_layout.js_layout
-    #sign_out
-      div: input._signout(type="button" value="signOut")
+        ul.menu
+      div.version= "v0.1_"+htmlWebpackPlugin.options.date
+    .right
+      div.location.hide
+        a.newer.fl
+          button newer
+        a.older.fr
+          button older
+      div.write
+      div.post
+        h1.title(data-fixture data-name="title")
+        .date: label
+        .data(data-editable data-name="data")
+      .footer
+  .menu_icon
+    div.new_post.hide(title="New Post") 
+      i.file.outline.icon
     div
-      div.data
-      div
-        input._input(type="text" placeholder="text")
-        button._input_btn talk
-  script(src="/js/main.js")
-  //-   include ../webpack/firebase.js
+      i.terminal.icon(title="Menu")
+  script(src="/js/blog.js")

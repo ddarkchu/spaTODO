@@ -75,63 +75,21 @@ function setPost(menu = "", id = "", data = {
 }) {
   let title = cm._q('div.post .title');
   let divData = cm._q('div.post .data');
-  title.className = "title";
-  title.setAttribute('menu_id', menu);
-  title.setAttribute('post_id', id);
-  title.innerHTML = data.title;
-  divData.innerHTML = data.data;
-}
-// getOldCurrent("-KnhPm67thcpzcZo_HuE","6",true)
-// cm._q('.location .older').onclick = () => {
-//   let title = cm._q('.post .title');
-//   getOldCurrent(title.getAttribute("menu_id"), title.getAttribute("post_id"), true)
-// }
-//
-// cm._q('.location .newer').onclick = () => {
-//   let title = cm._q('.post .title');
-//   getOldCurrent(title.getAttribute("menu_id"), title.getAttribute("post_id"))
-// }
+  let label = cm._q('div.post .date label');
+  if (title) {
+    title.className = "title";
+    title.setAttribute('menu_id', menu);
+    title.setAttribute('post_id', id);
+    title.innerHTML = data.title;
 
-function getOldCurrent(boardId, postId, old) {
-  cm.show(cm._q(".loading"));
-  // loadPost(t).then(() => {
-  //   cm.hide(cm._q(".loading"));
-  // }).catch(() => {
-  //   cm.hide(cm._q(".loading"));
-  // });
-  let db = database.ref("/board/" + boardId + "/data/");
-  if (postId) {
-    postId = +postId;
-    var promise;
-    if (old) { //과거
-      postId = "" + (postId - 1);
-      promise = db.orderByKey().endAt(postId).limitToLast(1).once('value');
-    } else { //최신
-      postId = "" + (postId + 1);
-      promise = db.orderByKey().startAt(postId).limitToFirst(1).once('value');
-    }
-    promise.then((snap) => {
-      let data = snap.val();
-      if (data) {
-        let keys = Object.keys(data);
-        if (keys.length > 0) {
-          setPost(boardId, keys[0], data[keys[0]]);
-        }
-      } else {
-        alert("페이지가 없습니다.")
-      }
-    }).then(() => {
-      cm.hide(cm._q(".loading"));
-    })
-  } else {
-    cm.hide(cm._q(".loading"));
   }
-  // return new Promise((s, f))
+  if (label)
+    label.innerText = Date.customString(data.createDate);
+  if (divData)
+    divData.innerHTML = data.data;
 }
 
 function loadPost(params) {
-
-
   return new Promise(function(sucess, fail) {
     let editor = ContentTools.EditorApp.get();
     if (editor._ignition) {
@@ -161,7 +119,7 @@ function loadPost(params) {
           sucess();
         });
       } else {
-        database.ref("/board/" + params.menu + "/data/").orderByChild('createDate').limitToLast(1).once("value").then(function(data) {
+        database.ref("/board/" + params.menu + "/data/").orderByKey().limitToLast(1).once("value").then(function(data) {
           let snap = data.val();
           let firstData;
           for (let key in snap) {
@@ -177,8 +135,6 @@ function loadPost(params) {
           sucess();
         });
       }
-
-
     } else {
       let menu = document.querySelector('.menu li:nth-child(1) > a');
       if (menu)
@@ -310,6 +266,7 @@ function newData() {
 function contentTools() {
   let editor = ContentTools.EditorApp.get();
   if (editor && firebase.auth().currentUser) {
+    ContentTools.IMAGE_UPLOADER = ImageUploader.createImageUploader;
     cm.show(cm._q(".menu_icon .new_post"));
     editor.init('[data-editable], [data-fixture]', 'data-name');
     editor.addEventListener('stop', function(ev) {
@@ -359,35 +316,7 @@ function initMenuButton() {
   }
 }
 
-// window.onload = function() {
-//
-//     FIXTURE_TOOLS = [['undo', 'redo', 'remove']];
-//     ContentEdit.Root.get().bind('focus', function(element) {
-//       var tools;
-//       if (element.isFixed()) {
-//         tools = FIXTURE_TOOLS;
-//       } else {
-//         tools = ContentTools.DEFAULT_TOOLS;
-//       }
-//       if (editor.toolbox().tools() !== tools) {
-//         return editor.toolbox().tools(tools);
-//       }
-//     });
-//     req = new XMLHttpRequest();
-//     req.overrideMimeType('application/json');
-//     req.open('GET', 'https://raw.githubusercontent.com/GetmeUK/ContentTools/master/translations/lp.json', true);
-//     return req.onreadystatechange = function(ev) {
-//       var translations;
-//       if (ev.target.readyState === 4) {
-//         translations = JSON.parse(ev.target.responseText);
-//         ContentEdit.addTranslations('lp', translations);
-//         return ContentEdit.LANGUAGE = 'lp';
-//       }
-//     };
-//   };
-//
-// }).call(this);
-//
+
 function menuHide() {
   let main = cm._q('.main');
   if (main.className.indexOf("left_hide") < 0) {
@@ -442,3 +371,167 @@ function setOldCurrent(boardId, postId) {
     })
   }
 }
+
+
+var ImageUploader;
+
+ImageUploader = (function() {
+  ImageUploader.imagePath = 'image.png';
+
+  ImageUploader.imageSize = [600, 174];
+
+  function ImageUploader(dialog) {
+    this._dialog = dialog;
+    this._dialog.addEventListener('cancel', (function(_this) {
+      return function() {
+        return _this._onCancel();
+      };
+    })(this));
+    this._dialog.addEventListener('imageuploader.cancelupload', (function(_this) {
+      return function() {
+        return _this._onCancelUpload();
+      };
+    })(this));
+    this._dialog.addEventListener('imageuploader.clear', (function(_this) {
+      return function() {
+        return _this._onClear();
+      };
+    })(this));
+    this._dialog.addEventListener('imageuploader.fileready', (function(_this) {
+      return function(ev) {
+        return _this._onFileReady(ev.detail().file);
+      };
+    })(this));
+    this._dialog.addEventListener('imageuploader.mount', (function(_this) {
+      return function() {
+        return _this._onMount();
+      };
+    })(this));
+    // this._dialog.addEventListener('imageuploader.rotateccw', (function(_this) {
+    //   return function() {
+    //     return _this._onRotateCCW();
+    //   };
+    // })(this));
+    // this._dialog.addEventListener('imageuploader.rotatecw', (function(_this) {
+    //   return function() {
+    //     return _this._onRotateCW();
+    //   };
+    // })(this));
+    this._dialog.addEventListener('imageuploader.save', (function(_this) {
+      return function() {
+        return _this._onSave();
+      };
+    })(this));
+    this._dialog.addEventListener('imageuploader.unmount', (function(_this) {
+      return function() {
+        return _this._onUnmount();
+      };
+    })(this));
+  }
+
+  ImageUploader.prototype._onCancel = function() {};
+
+  ImageUploader.prototype._onCancelUpload = function() {
+    if (this._uploading.cancel) {
+      this._uploading.cancel();
+    }
+    return this._dialog.state('empty');
+  };
+
+  ImageUploader.prototype._onClear = function() {
+    return this._dialog.clear();
+  };
+
+  ImageUploader.prototype._onFileReady = function(file) {
+    var upload;
+    console.log(file);
+    this._dialog.progress(0);
+    this._dialog.state('uploading');
+    var storageRef = firebase.storage().ref('images');
+    var uploadTask = storageRef.child(file.name).put(file);
+    ((_this) => {
+      uploadTask.on('state_changed', function(snapshot) {
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+        _this._dialog.progress(progress);
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log('Upload is paused');
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log('Upload is running');
+            break;
+        }
+      }, function(error) {}, function() {
+        _this.imagePath = uploadTask.snapshot.downloadURL;
+        var fr = new FileReader;
+
+        fr.onload = function() { // file is loaded
+          var img = new Image;
+
+          img.onload = function() {
+            _this.imageSize = [img.width, img.height];
+            _this._dialog.populate(_this.imagePath, _this.imageSize);
+          };
+          img.src = fr.result; // is the data URL because called with readAsDataURL
+        };
+
+        fr.readAsDataURL(file); //
+        return;
+      });
+    })(this)
+
+    return this._uploading = uploadTask;
+  };
+
+  ImageUploader.prototype._onMount = function() {};
+
+  // ImageUploader.prototype._onRotateCCW = function() {
+  //   var clearBusy;
+  //   this._dialog.busy(true);
+  //   clearBusy = (function(_this) {
+  //     return function() {
+  //       return _this._dialog.busy(false);
+  //     };
+  //   })(this);
+  //   return setTimeout(clearBusy, 1500);
+  // };
+  //
+  // ImageUploader.prototype._onRotateCW = function() {
+  //   var clearBusy;
+  //   this._dialog.busy(true);
+  //   clearBusy = (function(_this) {
+  //     return function() {
+  //       return _this._dialog.busy(false);
+  //     };
+  //   })(this);
+  //   return setTimeout(clearBusy, 1500);
+  // };
+
+  ImageUploader.prototype._onSave = function() {
+    var clearBusy;
+    this._dialog.busy(true);
+    clearBusy = (function(_this) {
+      return function() {
+        _this._dialog.busy(false);
+        return _this._dialog.save(_this.imagePath, _this.imageSize, {
+          alt: 'Example of bad variable names'
+        });
+      };
+    })(this);
+    return setTimeout(clearBusy, 1500);
+  };
+
+  ImageUploader.prototype._onUnmount = function() {};
+
+  ImageUploader.createImageUploader = function(dialog) {
+    return new ImageUploader(dialog);
+  };
+
+  return ImageUploader;
+
+})();
+
+window.ImageUploader = ImageUploader;

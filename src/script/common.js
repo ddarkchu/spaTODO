@@ -1,5 +1,3 @@
-
-
 function hide(el) {
   if (el) {
     el.classList.add('hide')
@@ -44,11 +42,32 @@ function validCheck(query) {
   return result;
 }
 
-module.exports={
-  validCheck:validCheck,
-  changeViewDisplay:changeViewDisplay,
-  _q:_q,
-  _qs:_qs,
-  show:show,
-  hide:hide
+module.exports = {
+  validCheck: validCheck,
+  changeViewDisplay: changeViewDisplay,
+  _q: _q,
+  _qs: _qs,
+  show: show,
+  hide: hide
+}
+Date.customString = (longTime) => {
+  var check = (string) => {
+    string += "";
+    return string.length == 1 ? "0" + string : string;
+  }
+
+  var date;
+  var result = "";
+  if (longTime) {
+    date = new Date(longTime);
+  } else {
+    date = new Date();
+  }
+  
+  if (date) {
+    result = date.getFullYear() + "/" + check(date.getMonth() + 1) + "/" + check(date.getDate()) + " " +
+      check(date.getHours()) +
+      ":" + check(date.getMinutes());
+  }
+  return result;
 }

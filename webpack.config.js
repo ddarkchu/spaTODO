@@ -67,7 +67,7 @@ module.exports = {
   },
   plugins: [
     pugPage('index'),
-    pugPage('blog'),
+    pugPage('sign'),
     new CopyWebpackPlugin([{
       from: "src/plugin/contentTools",
       to: "contentTools/"

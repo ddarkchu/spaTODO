@@ -4,6 +4,7 @@ body {
 
 html {
   height: 100%;
+  font-size: 16px;
 }
 
 .hide {
@@ -173,4 +174,11 @@ div.loading>div::after {
 
 .footer{
   height: 300px;
+}
+.location {
+  width: 100%;
+  display: inline-block;
+}
+.date{
+  margin-bottom: 10px;
 }

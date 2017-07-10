@@ -189,6 +189,25 @@ module.exports = {
   show: show,
   hide: hide
 };
+Date.customString = function (longTime) {
+  var check = function check(string) {
+    string += "";
+    return string.length == 1 ? "0" + string : string;
+  };
+
+  var date;
+  var result = "";
+  if (longTime) {
+    date = new Date(longTime);
+  } else {
+    date = new Date();
+  }
+
+  if (date) {
+    result = date.getFullYear() + "/" + check(date.getMonth() + 1) + "/" + check(date.getDate()) + " " + check(date.getHours()) + ":" + check(date.getMinutes());
+  }
+  return result;
+};
 
 /***/ }),
 /* 1 */
@@ -239,7 +258,7 @@ exports = module.exports = __webpack_require__(3)(undefined);
 
 
 // module
-exports.push([module.i, "body{margin:0}html{height:100%}.hide{display:none!important}.left{z-index:1;-moz-transition:all 1s;-webkit-transition:all 1s;-ms-transition:all 1s;-o-transition:all 1s;transition:all 1s;position:fixed;background-color:red;width:300px;left:0;background:#a9a9a9}.left,.right{height:inherit}.right{max-width:920px;margin:0 auto}.main{width:100%;height:100%;position:relative}.fl,.main{float:left}.fr{float:right}.main.left_hide .left{left:-300px}ul.menu{list-style-type:none;padding:0;text-align:center}ul.menu,ul.menu li{width:100%}ul.menu a{width:inherit;text-overflow:ellipsis;overflow:hidden;display:inline-block}ul.menu a:hover{background-color:gray}div.loading{position:absolute;width:100%;z-index:9999999;text-align:center;height:100%;line-height:320pt;background-color:#000;opacity:.4;color:#fff}div.loading>div:after{content:\"Loading\";animation:changeLetter 3s linear infinite alternate}@keyframes changeLetter{0%{font-size:10pt}50%{font-size:15pt}to{font-size:20pt}}.menu_icon{position:fixed;display:block;bottom:0;z-index:1}.menu_icon>div{bottom:50px;width:48px;height:48px;background:gray;border-radius:30%;left:10px;position:absolute;display:block;text-align:center}.menu_icon>div>i{font-size:35px}.menu_icon>div.new_post,.menu_icon>div>i{line-height:48px;color:#fff;cursor:pointer}.menu_icon>div.new_post{background-color:#cd5c5c;bottom:100px;font-size:20px}@media (max-width:1000px){.menu_icon>div{width:80px;height:80px}.menu_icon>div>i{line-height:80px;font-size:35pt}.menu_icon>div.new_post{bottom:135px;line-height:80px;font-size:35px;color:#fff;text-align:center;cursor:pointer}}.menu_icon>div.new_post:hover{color:#000}.menu_icon>div>i:hover{-ms-transform:rotate(-10deg);-webkit-transform:rotate(-10deg);transform:rotate(-10deg)}.left .version{bottom:0;position:fixed}.footer{height:300px}", ""]);
+exports.push([module.i, "body{margin:0}html{height:100%;font-size:16px}.hide{display:none!important}.left{z-index:1;-moz-transition:all 1s;-webkit-transition:all 1s;-ms-transition:all 1s;-o-transition:all 1s;transition:all 1s;position:fixed;background-color:red;width:300px;left:0;background:#a9a9a9}.left,.right{height:inherit}.right{max-width:920px;margin:0 auto}.main{width:100%;height:100%;position:relative}.fl,.main{float:left}.fr{float:right}.main.left_hide .left{left:-300px}ul.menu{list-style-type:none;padding:0;text-align:center}ul.menu,ul.menu li{width:100%}ul.menu a{width:inherit;text-overflow:ellipsis;overflow:hidden;display:inline-block}ul.menu a:hover{background-color:gray}div.loading{position:absolute;width:100%;z-index:9999999;text-align:center;height:100%;line-height:320pt;background-color:#000;opacity:.4;color:#fff}div.loading>div:after{content:\"Loading\";animation:changeLetter 3s linear infinite alternate}@keyframes changeLetter{0%{font-size:10pt}50%{font-size:15pt}to{font-size:20pt}}.menu_icon{position:fixed;display:block;bottom:0;z-index:1}.menu_icon>div{bottom:50px;z-index:1;width:48px;height:48px;background:gray;border-radius:30%;left:10px;position:absolute;display:block;text-align:center}.menu_icon>div>i{font-size:35px}.menu_icon>div.new_post,.menu_icon>div>i{line-height:48px;color:#fff;cursor:pointer}.menu_icon>div.new_post{background-color:#cd5c5c;bottom:100px;font-size:20px}@media (max-width:1000px){.menu_icon>div{width:80px;height:80px}.menu_icon>div>i{line-height:80px;font-size:35pt}.menu_icon>div.new_post{bottom:135px;line-height:80px;font-size:35px;color:#fff;text-align:center;cursor:pointer}}.menu_icon>div>i:hover{-ms-transform:rotate(-10deg);-webkit-transform:rotate(-10deg);transform:rotate(-10deg)}.left .version{bottom:0;position:fixed}.footer{height:300px}.location{width:100%;display:inline-block}.date{margin-bottom:10px}", ""]);
 
 // exports
 
@@ -890,12 +909,26 @@ function setPost() {
 
   var title = cm._q('div.post .title');
   var divData = cm._q('div.post .data');
-  title.className = "title";
-  title.setAttribute('menu_id', menu);
-  title.setAttribute('post_id', id);
-  title.innerHTML = data.title;
-  divData.innerHTML = data.data;
+  var label = cm._q('div.post .date label');
+  if (title) {
+    title.className = "title";
+    title.setAttribute('menu_id', menu);
+    title.setAttribute('post_id', id);
+    title.innerHTML = data.title;
+  }
+  if (label) label.innerText = Date.customString(data.createDate);
+  if (divData) divData.innerHTML = data.data;
 }
+// getOldCurrent("-KnhPm67thcpzcZo_HuE","6",true)
+// cm._q('.location .older').onclick = () => {
+//   let title = cm._q('.post .title');
+//   getOldCurrent(title.getAttribute("menu_id"), title.getAttribute("post_id"), true)
+// }
+//
+// cm._q('.location .newer').onclick = () => {
+//   let title = cm._q('.post .title');
+//   getOldCurrent(title.getAttribute("menu_id"), title.getAttribute("post_id"))
+// }
 
 function getOldCurrent(boardId, postId, old) {
   cm.show(cm._q(".loading"));
@@ -907,17 +940,33 @@ function getOldCurrent(boardId, postId, old) {
   var db = database.ref("/board/" + boardId + "/data/");
   if (postId) {
     postId = +postId;
+    var promise;
     if (old) {
       //과거
       postId = "" + (postId - 1);
-      return db.orderByKey().endAt(postId).limitToLast(1).once('value');
+      promise = db.orderByKey().endAt(postId).limitToLast(1).once('value');
     } else {
       //최신
       postId = "" + (postId + 1);
-      return db.orderByKey().startAt(postId).limitToFirst(1).once('value');
+      promise = db.orderByKey().startAt(postId).limitToFirst(1).once('value');
     }
+    promise.then(function (snap) {
+      var data = snap.val();
+      if (data) {
+        var keys = Object.keys(data);
+        if (keys.length > 0) {
+          setPost(boardId, keys[0], data[keys[0]]);
+        }
+      } else {
+        alert("페이지가 없습니다.");
+      }
+    }).then(function () {
+      cm.hide(cm._q(".loading"));
+    });
+  } else {
+    cm.hide(cm._q(".loading"));
   }
-  return new Promise((s, f));
+  // return new Promise((s, f))
 }
 
 function loadPost(params) {
@@ -936,17 +985,22 @@ function loadPost(params) {
 
       if (params.post) {
         database.ref("/board/" + params.menu + "/data/" + params.post).once("value").then(function (snap) {
-          if (snap.val()) {
-            setPost(params.menu, params.post, snap.val());
-          } else {
+          var data = {
+            menu: params.menu,
+            post: params.post,
+            data: snap.val()
+          };
+          if (!data.data) {
             alert("해당 글이 없습니다.");
-            setPost();
           }
+          setOldCurrent(data.menu, data.post).then(function () {
+            setPost(data.menu, data.post, data.data);
+          });
           menuHide();
           sucess();
         });
       } else {
-        database.ref("/board/" + params.menu + "/data/").orderByChild('createDate').limitToLast(1).once("value").then(function (data) {
+        database.ref("/board/" + params.menu + "/data/").orderByKey().limitToLast(1).once("value").then(function (data) {
           var snap = data.val();
           var firstData = void 0;
           for (var key in snap) {
@@ -956,6 +1010,7 @@ function loadPost(params) {
               break;
             }
           }
+          setOldCurrent(params.menu, firstData.postId);
           setPost(params.menu, firstData.postId, firstData);
           menuHide();
           sucess();
@@ -1176,6 +1231,46 @@ function menuShow() {
   var main = cm._q('.main');
   if (main.className.indexOf("left_hide") >= 0) {
     main.classList.remove('left_hide');
+  }
+}
+
+function setOldCurrent(boardId, postId) {
+  if (!postId) {
+    cm._q(".location").classList.add('hide');
+    return new Promise(function (s, f) {
+      console.log("postId가 없음.");
+      f("postId가 없음.");
+    });
+  }
+  var db = database.ref("/board/" + boardId + "/data/");
+  if (postId) {
+    postId = +postId;
+    var promiseList = [];
+    promiseList.push(db.orderByKey().endAt("" + (postId - 1)).limitToLast(1).once('value')); //과거
+    promiseList.push(db.orderByKey().startAt("" + (postId + 1)).limitToFirst(1).once('value')); // 최신
+    return Promise.all(promiseList).then(function (snap) {
+      for (var i = 0; i < snap.length; i++) {
+        var selector = ".location .newer";
+        if (i == 0) {
+          selector = ".location .older";
+        }
+        if (snap[i]) {
+          var data = snap[i].val();
+          if (data) {
+            var key = Object.keys(data);
+            if (key[0]) {
+              cm._q(selector).classList.remove('hide');
+              cm._q(selector).setAttribute("href", location.pathname + "#menu=" + boardId + "&post=" + key[0]);
+            }
+          } else {
+            cm._q(selector).classList.add('hide');
+          }
+        } else {
+          cm._q(selector).classList.add('hide');
+        }
+      }
+      cm._q(".location").classList.remove('hide');
+    });
   }
 }
 

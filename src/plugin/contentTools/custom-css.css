@@ -765,3 +765,6 @@ img.align-right, iframe.align-right, video.align-right, .ce-element--type-image.
     left: 0px;
   }
 }
+.ct-control-group--left{
+  display: none;
+}
