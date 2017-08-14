@@ -345,13 +345,13 @@ function setOldCurrent(boardId, postId) {
               cm._q(selector).classList.remove('hide');
               let url = "/post?menu=" + boardId + "&post=" + key[0];
               cm._q(selector).setAttribute("href", url);
-              cm._q(selector).onclick = () => {
-                return ((url) => {
-                  window.history.pushState("", "", url);
-                  dataReload();
-                  return false
-                })(url);
-              }
+              // cm._q(selector).onclick = () => {
+              //   return ((url) => {
+              //     window.history.pushState("", "", url);
+              //     dataReload();
+              //     return false
+              //   })(url);
+              // }
             }
           } else {
             cm._q(selector).classList.add('hide');

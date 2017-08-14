@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -806,10 +806,83 @@ module.exports = function (css) {
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.getParams = getParams;
+exports.hashToValue = hashToValue;
+function getParams() {
+	var data = {};
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
+
+	try {
+		for (var _iterator = location.search.replace("?", "").split("&")[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			var item = _step.value;
+
+			var keyValue = item.split('=');
+			data[keyValue[0]] = keyValue[1];
+		}
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
+			}
+		}
+	}
+
+	return data;
+}
+function hashToValue() {
+	var data = {};
+	var _iteratorNormalCompletion2 = true;
+	var _didIteratorError2 = false;
+	var _iteratorError2 = undefined;
+
+	try {
+		for (var _iterator2 = location.hash.replace("#/", "").split("&")[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+			var item = _step2.value;
+
+			var keyValue = item.split('=');
+			data[keyValue[0]] = keyValue[1];
+		}
+	} catch (err) {
+		_didIteratorError2 = true;
+		_iteratorError2 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion2 && _iterator2.return) {
+				_iterator2.return();
+			}
+		} finally {
+			if (_didIteratorError2) {
+				throw _iteratorError2;
+			}
+		}
+	}
+
+	return data;
+}
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var style = __webpack_require__(1);
 style.use();
 var cm = __webpack_require__(0);
-var util = __webpack_require__(9);
+var util = __webpack_require__(6);
 var database = firebase.database();
 var loadMenu = new Promise(function loadMenu(resolve, reject) {
   var menu = database.ref("/menu/data");
@@ -1159,18 +1232,16 @@ function setOldCurrent(boardId, postId) {
           if (data) {
             var key = Object.keys(data);
             if (key[0]) {
-              (function () {
-                cm._q(selector).classList.remove('hide');
-                var url = "/post?menu=" + boardId + "&post=" + key[0];
-                cm._q(selector).setAttribute("href", url);
-                cm._q(selector).onclick = function () {
-                  return function (url) {
-                    window.history.pushState("", "", url);
-                    dataReload();
-                    return false;
-                  }(url);
-                };
-              })();
+              cm._q(selector).classList.remove('hide');
+              var url = "/post?menu=" + boardId + "&post=" + key[0];
+              cm._q(selector).setAttribute("href", url);
+              // cm._q(selector).onclick = () => {
+              //   return ((url) => {
+              //     window.history.pushState("", "", url);
+              //     dataReload();
+              //     return false
+              //   })(url);
+              // }
             }
           } else {
             cm._q(selector).classList.add('hide');
@@ -1330,81 +1401,6 @@ ImageUploader = function () {
   return ImageUploader;
 }();
 window.ImageUploader = ImageUploader;
-
-/***/ }),
-/* 7 */,
-/* 8 */,
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.getParams = getParams;
-exports.hashToValue = hashToValue;
-function getParams() {
-	var data = {};
-	var _iteratorNormalCompletion = true;
-	var _didIteratorError = false;
-	var _iteratorError = undefined;
-
-	try {
-		for (var _iterator = location.search.replace("?", "").split("&")[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-			var item = _step.value;
-
-			var keyValue = item.split('=');
-			data[keyValue[0]] = keyValue[1];
-		}
-	} catch (err) {
-		_didIteratorError = true;
-		_iteratorError = err;
-	} finally {
-		try {
-			if (!_iteratorNormalCompletion && _iterator.return) {
-				_iterator.return();
-			}
-		} finally {
-			if (_didIteratorError) {
-				throw _iteratorError;
-			}
-		}
-	}
-
-	return data;
-}
-function hashToValue() {
-	var data = {};
-	var _iteratorNormalCompletion2 = true;
-	var _didIteratorError2 = false;
-	var _iteratorError2 = undefined;
-
-	try {
-		for (var _iterator2 = location.hash.replace("#/", "").split("&")[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-			var item = _step2.value;
-
-			var keyValue = item.split('=');
-			data[keyValue[0]] = keyValue[1];
-		}
-	} catch (err) {
-		_didIteratorError2 = true;
-		_iteratorError2 = err;
-	} finally {
-		try {
-			if (!_iteratorNormalCompletion2 && _iterator2.return) {
-				_iterator2.return();
-			}
-		} finally {
-			if (_didIteratorError2) {
-				throw _iteratorError2;
-			}
-		}
-	}
-
-	return data;
-}
 
 /***/ })
 /******/ ]);
