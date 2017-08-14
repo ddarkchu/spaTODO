@@ -811,468 +811,535 @@ style.use();
 var cm = __webpack_require__(0);
 var database = firebase.database();
 var loadMenu = new Promise(function loadMenu(resolve, reject) {
-  var menu = database.ref("/menu/data");
-  menu.orderByKey().once('value').then(function (datas) {
-    try {
-      var ul = document.querySelector('ul.menu');
-      var data = datas.val();
-      for (var key in data) {
-        var label = document.createElement("label");
-        var text = document.createTextNode(data[key]);
-        label.appendChild(text);
-        var a = document.createElement("a");
-        a.appendChild(label);
-        a.setAttribute("href", "#menu=" + key);
-        a.setAttribute("title", data[key]);
-        a.onclick = function (key) {
-          return function () {
-            console.log(key);
-            if (location.hash == "#menu=" + key) {
-              cm.show(cm._q(".loading"));
-              loadPost({
-                menu: key
-              }).then(function () {
-                cm.hide(cm._q(".loading"));
-              });
-            }
-          };
-        }(key);
-        //
-        var li = document.createElement("li");
-        li.appendChild(a);
-        ul.appendChild(li);
-      }
-      resolve();
-    } catch (err) {
-      console.error(err);
-      reject(err);
-    }
-  });
+	var menu = database.ref("/menu/data");
+	menu.orderByKey().once('value').then(function (datas) {
+		try {
+			var ul = document.querySelector('ul.menu');
+			var data = datas.val();
+			var firstMenu = "";
+			for (var key in data) {
+				if (firstMenu == "") {
+					firstMenu = key;
+				}
+				var label = document.createElement("label");
+				var text = document.createTextNode(data[key]);
+				label.appendChild(text);
+				var a = document.createElement("a");
+				a.appendChild(label);
+				a.setAttribute("href", "#/menu=" + key);
+				a.setAttribute("title", data[key]);
+				a.onclick = function (key) {
+					return function () {
+						console.log(key);
+						if (location.hash == "#/menu=" + key) {
+							cm.show(cm._q(".loading"));
+							loadPost({
+								menu: key
+							}).then(function () {
+								cm.hide(cm._q(".loading"));
+							});
+						}
+					};
+				}(key);
+				//
+				var li = document.createElement("li");
+				li.appendChild(a);
+				ul.appendChild(li);
+			}
+			resolve(firstMenu);
+		} catch (err) {
+			console.error(err);
+			reject(err);
+		}
+	});
 });
-loadMenu.then(function () {
-  var t = hashToValue();
-  loadPost(t).then(function () {
-    cm.hide(cm._q(".loading"));
-  });
+loadMenu.then(function (menu) {
+	var t = hashToValue();
+	if (!t.menu || t.menu == "") {
+		t.menu = menu;
+	}
+	loadPost(t).then(function () {
+		cm.hide(cm._q(".loading"));
+	});
 });
 // menu 메뉴 id
 // postId 게시글 아이디
-
 function postData() {
-  return {
-    title: "",
-    createDate: 0,
-    data: ""
-  };
+	return {
+		title: "",
+		createDate: 0,
+		data: ""
+	};
 }
 
 function hashToValue() {
-  var data = {};
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
+	var data = {};
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
 
-  try {
-    for (var _iterator = location.hash.replace("#", "").split("&")[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var item = _step.value;
+	try {
+		for (var _iterator = location.hash.replace("#/", "").split("&")[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			var item = _step.value;
 
-      var keyValue = item.split('=');
-      data[keyValue[0]] = keyValue[1];
-    }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
-  }
+			var keyValue = item.split('=');
+			data[keyValue[0]] = keyValue[1];
+		}
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
+			}
+		}
+	}
 
-  return data;
+	return data;
 }
 // saveData("-KnhPm67thcpzcZo_HuE", "firebase이용 개발", "realtime database 기존 디비에 비해 제약사항이 너무 많아서 생각해야 할것이 많다.");
-
 function setPost() {
-  var menu = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-  var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
-  var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {
-    title: "",
-    data: "",
-    createData: 0
-  };
+	var menu = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+	var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+	var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {
+		title: "",
+		data: "",
+		createData: 0
+	};
 
-  var title = cm._q('div.post .title');
-  var divData = cm._q('div.post .data');
-  var label = cm._q('div.post .date label');
-  if (title) {
-    title.className = "title";
-    title.setAttribute('menu_id', menu);
-    title.setAttribute('post_id', id);
-    title.innerHTML = data.title;
-  }
-  if (label) label.innerText = Date.customString(data.createDate);
-  if (divData) divData.innerHTML = data.data;
-}
-// getOldCurrent("-KnhPm67thcpzcZo_HuE","6",true)
-// cm._q('.location .older').onclick = () => {
-//   let title = cm._q('.post .title');
-//   getOldCurrent(title.getAttribute("menu_id"), title.getAttribute("post_id"), true)
-// }
-//
-// cm._q('.location .newer').onclick = () => {
-//   let title = cm._q('.post .title');
-//   getOldCurrent(title.getAttribute("menu_id"), title.getAttribute("post_id"))
-// }
-
-function getOldCurrent(boardId, postId, old) {
-  cm.show(cm._q(".loading"));
-  // loadPost(t).then(() => {
-  //   cm.hide(cm._q(".loading"));
-  // }).catch(() => {
-  //   cm.hide(cm._q(".loading"));
-  // });
-  var db = database.ref("/board/" + boardId + "/data/");
-  if (postId) {
-    postId = +postId;
-    var promise;
-    if (old) {
-      //과거
-      postId = "" + (postId - 1);
-      promise = db.orderByKey().endAt(postId).limitToLast(1).once('value');
-    } else {
-      //최신
-      postId = "" + (postId + 1);
-      promise = db.orderByKey().startAt(postId).limitToFirst(1).once('value');
-    }
-    promise.then(function (snap) {
-      var data = snap.val();
-      if (data) {
-        var keys = Object.keys(data);
-        if (keys.length > 0) {
-          setPost(boardId, keys[0], data[keys[0]]);
-        }
-      } else {
-        alert("페이지가 없습니다.");
-      }
-    }).then(function () {
-      cm.hide(cm._q(".loading"));
-    });
-  } else {
-    cm.hide(cm._q(".loading"));
-  }
-  // return new Promise((s, f))
+	var title = cm._q('div.post .title');
+	var divData = cm._q('div.post .data');
+	var label = cm._q('div.post .date label');
+	if (title) {
+		title.className = "title";
+		title.setAttribute('menu_id', menu);
+		title.setAttribute('post_id', id);
+		title.innerHTML = data.title;
+	}
+	if (label) label.innerText = Date.customString(data.createDate);
+	if (divData) divData.innerHTML = data.data;
 }
 
 function loadPost(params) {
-
-  return new Promise(function (sucess, fail) {
-    var editor = ContentTools.EditorApp.get();
-    if (editor._ignition) {
-      editor._ignition.cancel();
-      if (editor.getState() == "editing") {
-        menuHide();
-        sucess();
-        return;
-      }
-    }
-    if (params.menu) {
-
-      if (params.post) {
-        database.ref("/board/" + params.menu + "/data/" + params.post).once("value").then(function (snap) {
-          var data = {
-            menu: params.menu,
-            post: params.post,
-            data: snap.val()
-          };
-          if (!data.data) {
-            alert("해당 글이 없습니다.");
-          }
-          setOldCurrent(data.menu, data.post).then(function () {
-            setPost(data.menu, data.post, data.data);
-          });
-          menuHide();
-          sucess();
-        });
-      } else {
-        database.ref("/board/" + params.menu + "/data/").orderByKey().limitToLast(1).once("value").then(function (data) {
-          var snap = data.val();
-          var firstData = void 0;
-          for (var key in snap) {
-            if (snap.hasOwnProperty(key)) {
-              firstData = snap[key];
-              firstData['postId'] = key;
-              break;
-            }
-          }
-          setOldCurrent(params.menu, firstData.postId);
-          setPost(params.menu, firstData.postId, firstData);
-          menuHide();
-          sucess();
-        });
-      }
-    } else {
-      var menu = document.querySelector('.menu li:nth-child(1) > a');
-      if (menu) menu.click();
-      return;
-    }
-  });
+	return new Promise(function (sucess, fail) {
+		var editor = ContentTools.EditorApp.get();
+		if (editor._ignition) {
+			editor._ignition.cancel();
+			if (editor.getState() == "editing") {
+				menuHide();
+				sucess();
+				return;
+			}
+		}
+		if (params.menu) {
+			if (params.post) {
+				database.ref("/board/" + params.menu + "/data/" + params.post).once("value").then(function (snap) {
+					var data = {
+						menu: params.menu,
+						post: params.post,
+						data: snap.val()
+					};
+					if (!data.data) {
+						alert("해당 글이 없습니다.");
+					}
+					setOldCurrent(data.menu, data.post).then(function () {
+						setPost(data.menu, data.post, data.data);
+					});
+					menuHide();
+					sucess();
+				});
+			} else {
+				database.ref("/board/" + params.menu + "/data/").orderByKey().limitToLast(1).once("value").then(function (data) {
+					var snap = data.val();
+					var firstData = void 0;
+					for (var key in snap) {
+						if (snap.hasOwnProperty(key)) {
+							firstData = snap[key];
+							firstData['postId'] = key;
+							break;
+						}
+					}
+					setOldCurrent(params.menu, firstData.postId);
+					setPost(params.menu, firstData.postId, firstData);
+					menuHide();
+					sucess();
+				});
+			}
+		} else {
+			var menu = document.querySelector('.menu li:nth-child(1) > a');
+			if (menu) menu.click();
+			return;
+		}
+	});
 }
 
 function saveData(menu, title, data) {
-  return new Promise(function (s, f) {
-    var saveData = new postData();
-    saveData.title = title;
-    saveData.data = data;
-    saveData.createDate = new Date().getTime();
-
-    database.ref("/board/" + menu + "/boardTime").transaction(function (boardTime) {
-
-      if (!boardTime || boardTime < saveData.createDate) {
-        boardTime = saveData.createDate;
-      } else {
-        boardTime = undefined;
-      }
-      return boardTime;
-    }, function (error, committed, snapshot) {
-      if (error) {
-        console.log('Transaction failed abnormally!', error);
-      } else if (!committed) {
-        console.log('We aborted the transaction (because ada already exists).');
-      } else {
-        if (snapshot.val() == saveData.createDate) {
-          database.ref("/board/" + menu + "/boardCount").transaction(function (boardCount) {
-            if (!boardCount) {
-              boardCount = 0;
-            }
-            return boardCount + 1;
-          }, function (error, committed, snapshot) {
-            if (error) {
-              console.log('Transaction failed abnormally!', error);
-              s();
-            } else if (!committed) {
-              console.log('We aborted the transaction (because ada already exists).');
-              s();
-            } else {
-              var postId = snapshot.val();
-              database.ref("/board/" + menu + "/data/" + postId).set(saveData).then(function (snap) {
-                var title = cm._q('title');
-                if (title) {
-                  title.setAttribute("post_id", postId);
-                  s();
-                }
-              });
-            }
-          });
-        } else {
-          s();
-        }
-      }
-    });
-  });
+	return new Promise(function (s, f) {
+		var saveData = new postData();
+		saveData.title = title;
+		saveData.data = data;
+		saveData.createDate = new Date().getTime();
+		database.ref("/board/" + menu + "/boardTime").transaction(function (boardTime) {
+			if (!boardTime || boardTime < saveData.createDate) {
+				boardTime = saveData.createDate;
+			} else {
+				boardTime = undefined;
+			}
+			return boardTime;
+		}, function (error, committed, snapshot) {
+			if (error) {
+				console.log('Transaction failed abnormally!', error);
+			} else if (!committed) {
+				console.log('We aborted the transaction (because ada already exists).');
+			} else {
+				if (snapshot.val() == saveData.createDate) {
+					database.ref("/board/" + menu + "/boardCount").transaction(function (boardCount) {
+						if (!boardCount) {
+							boardCount = 0;
+						}
+						return boardCount + 1;
+					}, function (error, committed, snapshot) {
+						if (error) {
+							console.log('Transaction failed abnormally!', error);
+							s();
+						} else if (!committed) {
+							console.log('We aborted the transaction (because ada already exists).');
+							s();
+						} else {
+							var postId = snapshot.val();
+							database.ref("/board/" + menu + "/data/" + postId).set(saveData).then(function (snap) {
+								var title = cm._q('title');
+								if (title) {
+									title.setAttribute("post_id", postId);
+									s();
+								}
+							});
+						}
+					});
+				} else {
+					s();
+				}
+			}
+		});
+	});
 }
 // saveMenu("test2");
-
 function saveMenu(menu) {
-  var menuCount = database.ref("/menu/menuCount");
-  return menuCount.transaction(function (menuCount) {
-    if (!menuCount) {
-      menuCount = 0;
-    }
-    return menuCount + 1;
-  }, function (error, committed, snapshot) {
-    if (error) {
-      console.log('Transaction failed abnormally!', error);
-    } else if (!committed) {
-      console.log('We aborted the transaction (because ada already exists).');
-    }
-  }).then(function () {
-    return database.ref("/menu/data").push(menu);
-  }).catch(function () {
-    menuCount.transaction(function (menuCount) {
-      if (!menuCount) {
-        menuCount = 1;
-      }
-      return menuCount - 1;
-    }, function (error, committend, snapshot) {
-      if (error || !committed) {
-        console.log('server error');
-      }
-    });
-  });
+	var menuCount = database.ref("/menu/menuCount");
+	return menuCount.transaction(function (menuCount) {
+		if (!menuCount) {
+			menuCount = 0;
+		}
+		return menuCount + 1;
+	}, function (error, committed, snapshot) {
+		if (error) {
+			console.log('Transaction failed abnormally!', error);
+		} else if (!committed) {
+			console.log('We aborted the transaction (because ada already exists).');
+		}
+	}).then(function () {
+		return database.ref("/menu/data").push(menu);
+	}).catch(function () {
+		menuCount.transaction(function (menuCount) {
+			if (!menuCount) {
+				menuCount = 1;
+			}
+			return menuCount - 1;
+		}, function (error, committend, snapshot) {
+			if (error || !committed) {
+				console.log('server error');
+			}
+		});
+	});
 }
-
 document.body.onhashchange = function () {
-  var t = hashToValue();
-  cm.show(cm._q(".loading"));
-  loadPost(t).then(function () {
-    cm.hide(cm._q(".loading"));
-  }).catch(function () {
-    cm.hide(cm._q(".loading"));
-  });
+	var t = hashToValue();
+	cm.show(cm._q(".loading"));
+	loadPost(t).then(function () {
+		cm.hide(cm._q(".loading"));
+	}).catch(function () {
+		cm.hide(cm._q(".loading"));
+	});
 };
-
 firebase.auth().onAuthStateChanged(function (user) {
-  if (user) {
-    contentTools();
-  }
+	if (user) {
+		contentTools();
+	}
 });
 newData();
 
 function newData() {
-
-  cm._q('.menu_icon .new_post').onclick = function () {
-    menuHide();
-    var temp = hashToValue();
-    var editor = ContentTools.EditorApp.get();
-    var title = cm._q('div.post .title');
-    var divData = cm._q('div.post .data');
-    title.setAttribute('menu_id', temp.menu);
-    title.setAttribute('post_id', "");
-    title.innerHTML = "";
-    divData.innerHTML = "";
-    if (editor.getState() != "editing") ;
-    cm._q('.ct-ignition__button.ct-ignition__button--edit').click();
-  };
+	cm._q('.menu_icon .new_post').onclick = function () {
+		menuHide();
+		var temp = hashToValue();
+		var editor = ContentTools.EditorApp.get();
+		var title = cm._q('div.post .title');
+		var divData = cm._q('div.post .data');
+		title.setAttribute('menu_id', temp.menu);
+		title.setAttribute('post_id', "");
+		title.innerHTML = "";
+		divData.innerHTML = "";
+		if (editor.getState() != "editing") ;
+		cm._q('.ct-ignition__button.ct-ignition__button--edit').click();
+	};
 }
 
 function contentTools() {
-  var editor = ContentTools.EditorApp.get();
-  if (editor && firebase.auth().currentUser) {
-    cm.show(cm._q(".menu_icon .new_post"));
-    editor.init('[data-editable], [data-fixture]', 'data-name');
-    editor.addEventListener('stop', function (ev) {
-      var title = cm._q('div.post .title');
-      title.className = "title";
-    });
-    editor.addEventListener('saved', function (ev) {
-      var data = ev.detail().regions;
-      if (Object.keys(data).length === 0) {
-        return;
-      }
-      // let menu = hashToValue();
-      var postId = cm._q('.post .title').getAttribute("post_id");
-      var menu = cm._q('.post .title').getAttribute("menu_id");
-      cm.show(cm._q('.loading'));
-      editor.busy(true);
-      if (menu && postId) {
-        firebase.database().ref("/board/" + menu + "/data/" + postId).update(data).then(function () {
-          editor.busy(false);
-          cm.hide(cm._q('.loading'));
-        }).catch(function () {
-          editor.busy(false);
-          cm.hide(cm._q('.loading'));
-        });
-      } else if (menu) {
-        saveData(menu, data.title, data.data).then(function () {
-          editor.busy(false);
-          cm.hide(cm._q('.loading'));
-        });
-      }
-    });
-  }
+	var editor = ContentTools.EditorApp.get();
+	if (editor && firebase.auth().currentUser) {
+		ContentTools.IMAGE_UPLOADER = ImageUploader.createImageUploader;
+		cm.show(cm._q(".menu_icon .new_post"));
+		editor.init('[data-editable], [data-fixture]', 'data-name');
+		editor.addEventListener('stop', function (ev) {
+			var title = cm._q('div.post .title');
+			title.className = "title";
+		});
+		editor.addEventListener('saved', function (ev) {
+			var data = ev.detail().regions;
+			if (Object.keys(data).length === 0) {
+				return;
+			}
+			// let menu = hashToValue();
+			var postId = cm._q('.post .title').getAttribute("post_id");
+			var menu = cm._q('.post .title').getAttribute("menu_id");
+			cm.show(cm._q('.loading'));
+			editor.busy(true);
+			if (menu && postId) {
+				firebase.database().ref("/board/" + menu + "/data/" + postId).update(data).then(function () {
+					editor.busy(false);
+					cm.hide(cm._q('.loading'));
+				}).catch(function () {
+					editor.busy(false);
+					cm.hide(cm._q('.loading'));
+				});
+			} else if (menu) {
+				saveData(menu, data.title, data.data).then(function () {
+					editor.busy(false);
+					cm.hide(cm._q('.loading'));
+				});
+			}
+		});
+	}
 }
 initMenuButton();
 
 function initMenuButton() {
-  var div = cm._q('.menu_icon .terminal.icon').parentElement;
-  div.onclick = function () {
-    var main = cm._q('.main');
-    if (main.className.indexOf("left_hide") >= 0) {
-      main.classList.remove('left_hide');
-    } else {
-      main.classList.add('left_hide');
-    }
-  };
+	var div = cm._q('.menu_icon .terminal.icon').parentElement;
+	div.onclick = function () {
+		var main = cm._q('.main');
+		if (main.className.indexOf("left_hide") >= 0) {
+			main.classList.remove('left_hide');
+		} else {
+			main.classList.add('left_hide');
+		}
+	};
 }
 
-// window.onload = function() {
-//
-//     FIXTURE_TOOLS = [['undo', 'redo', 'remove']];
-//     ContentEdit.Root.get().bind('focus', function(element) {
-//       var tools;
-//       if (element.isFixed()) {
-//         tools = FIXTURE_TOOLS;
-//       } else {
-//         tools = ContentTools.DEFAULT_TOOLS;
-//       }
-//       if (editor.toolbox().tools() !== tools) {
-//         return editor.toolbox().tools(tools);
-//       }
-//     });
-//     req = new XMLHttpRequest();
-//     req.overrideMimeType('application/json');
-//     req.open('GET', 'https://raw.githubusercontent.com/GetmeUK/ContentTools/master/translations/lp.json', true);
-//     return req.onreadystatechange = function(ev) {
-//       var translations;
-//       if (ev.target.readyState === 4) {
-//         translations = JSON.parse(ev.target.responseText);
-//         ContentEdit.addTranslations('lp', translations);
-//         return ContentEdit.LANGUAGE = 'lp';
-//       }
-//     };
-//   };
-//
-// }).call(this);
-//
 function menuHide() {
-  var main = cm._q('.main');
-  if (main.className.indexOf("left_hide") < 0) {
-    main.classList.add('left_hide');
-  }
+	var main = cm._q('.main');
+	if (main.className.indexOf("left_hide") < 0) {
+		main.classList.add('left_hide');
+	}
 }
 
 function menuShow() {
-  var main = cm._q('.main');
-  if (main.className.indexOf("left_hide") >= 0) {
-    main.classList.remove('left_hide');
-  }
+	var main = cm._q('.main');
+	if (main.className.indexOf("left_hide") >= 0) {
+		main.classList.remove('left_hide');
+	}
 }
 
 function setOldCurrent(boardId, postId) {
-  if (!postId) {
-    cm._q(".location").classList.add('hide');
-    return new Promise(function (s, f) {
-      console.log("postId가 없음.");
-      f("postId가 없음.");
-    });
-  }
-  var db = database.ref("/board/" + boardId + "/data/");
-  if (postId) {
-    postId = +postId;
-    var promiseList = [];
-    promiseList.push(db.orderByKey().endAt("" + (postId - 1)).limitToLast(1).once('value')); //과거
-    promiseList.push(db.orderByKey().startAt("" + (postId + 1)).limitToFirst(1).once('value')); // 최신
-    return Promise.all(promiseList).then(function (snap) {
-      for (var i = 0; i < snap.length; i++) {
-        var selector = ".location .newer";
-        if (i == 0) {
-          selector = ".location .older";
-        }
-        if (snap[i]) {
-          var data = snap[i].val();
-          if (data) {
-            var key = Object.keys(data);
-            if (key[0]) {
-              cm._q(selector).classList.remove('hide');
-              cm._q(selector).setAttribute("href", location.pathname + "#menu=" + boardId + "&post=" + key[0]);
-            }
-          } else {
-            cm._q(selector).classList.add('hide');
-          }
-        } else {
-          cm._q(selector).classList.add('hide');
-        }
-      }
-      cm._q(".location").classList.remove('hide');
-    });
-  }
+	if (!postId) {
+		cm._q(".location").classList.add('hide');
+		return new Promise(function (s, f) {
+			console.log("postId가 없음.");
+			f("postId가 없음.");
+		});
+	}
+	var db = database.ref("/board/" + boardId + "/data/");
+	if (postId) {
+		postId = +postId;
+		var promiseList = [];
+		promiseList.push(db.orderByKey().endAt("" + (postId - 1)).limitToLast(1).once('value')); //과거
+		promiseList.push(db.orderByKey().startAt("" + (postId + 1)).limitToFirst(1).once('value')); // 최신
+		return Promise.all(promiseList).then(function (snap) {
+			for (var i = 0; i < snap.length; i++) {
+				var selector = ".location .newer";
+				if (i == 0) {
+					selector = ".location .older";
+				}
+				if (snap[i]) {
+					var data = snap[i].val();
+					if (data) {
+						var key = Object.keys(data);
+						if (key[0]) {
+							cm._q(selector).classList.remove('hide');
+							cm._q(selector).setAttribute("href", location.pathname + "#/menu=" + boardId + "&post=" + key[0]);
+						}
+					} else {
+						cm._q(selector).classList.add('hide');
+					}
+				} else {
+					cm._q(selector).classList.add('hide');
+				}
+			}
+			cm._q(".location").classList.remove('hide');
+		});
+	}
 }
+var ImageUploader;
+ImageUploader = function () {
+	ImageUploader.imagePath = 'image.png';
+	ImageUploader.imageSize = [600, 174];
+
+	function ImageUploader(dialog) {
+		this._dialog = dialog;
+		this._dialog.addEventListener('cancel', function (_this) {
+			return function () {
+				return _this._onCancel();
+			};
+		}(this));
+		this._dialog.addEventListener('imageuploader.cancelupload', function (_this) {
+			return function () {
+				return _this._onCancelUpload();
+			};
+		}(this));
+		this._dialog.addEventListener('imageuploader.clear', function (_this) {
+			return function () {
+				return _this._onClear();
+			};
+		}(this));
+		this._dialog.addEventListener('imageuploader.fileready', function (_this) {
+			return function (ev) {
+				return _this._onFileReady(ev.detail().file);
+			};
+		}(this));
+		this._dialog.addEventListener('imageuploader.mount', function (_this) {
+			return function () {
+				return _this._onMount();
+			};
+		}(this));
+		// this._dialog.addEventListener('imageuploader.rotateccw', (function(_this) {
+		//   return function() {
+		//     return _this._onRotateCCW();
+		//   };
+		// })(this));
+		// this._dialog.addEventListener('imageuploader.rotatecw', (function(_this) {
+		//   return function() {
+		//     return _this._onRotateCW();
+		//   };
+		// })(this));
+		this._dialog.addEventListener('imageuploader.save', function (_this) {
+			return function () {
+				return _this._onSave();
+			};
+		}(this));
+		this._dialog.addEventListener('imageuploader.unmount', function (_this) {
+			return function () {
+				return _this._onUnmount();
+			};
+		}(this));
+	}
+	ImageUploader.prototype._onCancel = function () {};
+	ImageUploader.prototype._onCancelUpload = function () {
+		if (this._uploading.cancel) {
+			this._uploading.cancel();
+		}
+		return this._dialog.state('empty');
+	};
+	ImageUploader.prototype._onClear = function () {
+		return this._dialog.clear();
+	};
+	ImageUploader.prototype._onFileReady = function (file) {
+		var upload;
+		console.log(file);
+		this._dialog.progress(0);
+		this._dialog.state('uploading');
+		var storageRef = firebase.storage().ref('images');
+		var uploadTask = storageRef.child(file.name).put(file);
+		(function (_this) {
+			uploadTask.on('state_changed', function (snapshot) {
+				// Observe state change events such as progress, pause, and resume
+				// Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+				var progress = snapshot.bytesTransferred / snapshot.totalBytes * 100;
+				console.log('Upload is ' + progress + '% done');
+				_this._dialog.progress(progress);
+				switch (snapshot.state) {
+					case firebase.storage.TaskState.PAUSED:
+						// or 'paused'
+						console.log('Upload is paused');
+						break;
+					case firebase.storage.TaskState.RUNNING:
+						// or 'running'
+						console.log('Upload is running');
+						break;
+				}
+			}, function (error) {}, function () {
+				_this.imagePath = uploadTask.snapshot.downloadURL;
+				var fr = new FileReader();
+				fr.onload = function () {
+					// file is loaded
+					var img = new Image();
+					img.onload = function () {
+						_this.imageSize = [img.width, img.height];
+						_this._dialog.populate(_this.imagePath, _this.imageSize);
+					};
+					img.src = fr.result; // is the data URL because called with readAsDataURL
+				};
+				fr.readAsDataURL(file); //
+				return;
+			});
+		})(this);
+		return this._uploading = uploadTask;
+	};
+	ImageUploader.prototype._onMount = function () {};
+	// ImageUploader.prototype._onRotateCCW = function() {
+	//   var clearBusy;
+	//   this._dialog.busy(true);
+	//   clearBusy = (function(_this) {
+	//     return function() {
+	//       return _this._dialog.busy(false);
+	//     };
+	//   })(this);
+	//   return setTimeout(clearBusy, 1500);
+	// };
+	//
+	// ImageUploader.prototype._onRotateCW = function() {
+	//   var clearBusy;
+	//   this._dialog.busy(true);
+	//   clearBusy = (function(_this) {
+	//     return function() {
+	//       return _this._dialog.busy(false);
+	//     };
+	//   })(this);
+	//   return setTimeout(clearBusy, 1500);
+	// };
+	ImageUploader.prototype._onSave = function () {
+		var clearBusy;
+		this._dialog.busy(true);
+		clearBusy = function (_this) {
+			return function () {
+				_this._dialog.busy(false);
+				return _this._dialog.save(_this.imagePath, _this.imageSize, {
+					alt: 'Example of bad variable names'
+				});
+			};
+		}(this);
+		return setTimeout(clearBusy, 1500);
+	};
+	ImageUploader.prototype._onUnmount = function () {};
+	ImageUploader.createImageUploader = function (dialog) {
+		return new ImageUploader(dialog);
+	};
+	return ImageUploader;
+}();
+window.ImageUploader = ImageUploader;
 
 /***/ })
 /******/ ]);
