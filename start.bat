@@ -1,1 +1,1 @@
-webpack && firebase deploy && webpack-dev-server
+webpack && firebase deploy && firebase-serve

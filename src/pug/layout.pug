@@ -1,6 +1,7 @@
 doctype html
 html
   head
+    meta(name="viewport" content="width=device-width,  initial-scale=1")
     meta(name="google-site-verification" content="_A-g3AbUhbfZyyIrlqEjHm8QlprCgfZXnM9ZiAAGshk")
     script(src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous")
     link( rel="stylesheet" href="/contentTools/content-tools.min.css")
@@ -19,6 +20,6 @@ html
         messagingSenderId: "112475226816"
       };
       firebase.initializeApp(config);
-    title= title
+    title(data-name="닥츄블로그") 닥츄블로그
   body
     block content

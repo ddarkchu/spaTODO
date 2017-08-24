@@ -965,6 +965,7 @@ function setPost() {
   var title = cm._q('div.post .title');
   var divData = cm._q('div.post .data');
   var label = cm._q('div.post .date label');
+  $('title').text($('title').attr("data-name"));
   if (title) {
     title.className = "title";
     if (menu && menu != "") {
@@ -972,6 +973,7 @@ function setPost() {
     }
     if (id != "") {
       title.setAttribute('post_id', id);
+      $('title').text($('<div>' + data.title + '</div>').text());
       title.innerHTML = data.title;
       if (label) label.innerText = Date.customString(data.createDate);
       if (divData) divData.innerHTML = data.data;
